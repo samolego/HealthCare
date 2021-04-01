@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "org.samo_lego.healthcare.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "EntityAccessor",
+    "EntityTrackerUpdateS2CPacketAccessor",
+    "PlayerEntityMixinCast_Preferences",
+    "ServerPlayNetworkHandlerMixin_HealthTag"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
