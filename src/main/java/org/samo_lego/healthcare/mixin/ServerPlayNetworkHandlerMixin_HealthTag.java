@@ -20,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -40,21 +41,26 @@ public class ServerPlayNetworkHandlerMixin_HealthTag {
             List<DataTracker.Entry<?>> trackedValues = ((EntityTrackerUpdateS2CPacketAccessor) packet).getTrackedValues();
 
             Entity entity = this.player.getServerWorld().getEntityById(((EntityTrackerUpdateS2CPacketAccessor) packet).getId());
-            if(entity instanceof LivingEntity && ((HealthbarPreferences) this.player).isEnabled()) {
+            if(entity instanceof LivingEntity && ((HealthbarPreferences) this.player).isEnabled() && !(entity instanceof ServerPlayerEntity)) {
                 // Removing current custom name
                 trackedValues.removeIf(value -> value.getData().getId() == 2);
 
-                DataTracker.Entry<Optional<Text>> healthTag = new DataTracker.Entry<>(EntityAccessor.getCUSTOM_NAME(), Optional.of(new LiteralText("")));
-                DataTracker.Entry<Boolean> visibleTag = new DataTracker.Entry<>(EntityAccessor.getNAME_VISIBLE(), true);
+                // Ensure name is visible only if mob is not too far away
+                boolean visible = entity.distanceTo(player) < 8.0F || entity.isCustomNameVisible();
+                DataTracker.Entry<Boolean> visibleTag = new DataTracker.Entry<>(EntityAccessor.getNAME_VISIBLE(), visible);
 
                 LivingEntity living = (LivingEntity) entity;
                 float health = living.getHealth();
                 float maxHealth = living.getMaxHealth();
 
-                MutableText name = living.hasCustomName() ? (MutableText) living.getCustomName() : new TranslatableText(living.getType().getTranslationKey());
+                try {
+                    System.out.println("Has name: " + entity.hasCustomName());
+                } catch(NullPointerException ignored) {
+                }
+                MutableText name = entity.hasCustomName() ?  (MutableText) entity.getCustomName() : new TranslatableText(entity.getType().getTranslationKey());
 
-                String healthbar = ((HealthbarPreferences) this.player).getHealth(health, maxHealth);
-                healthTag.set(Optional.of(name.append(" ").append(new LiteralText(healthbar))));
+                Text healthbar = ((HealthbarPreferences) this.player).getHealth(health, maxHealth);
+                DataTracker.Entry<Optional<Text>> healthTag = new DataTracker.Entry<>(EntityAccessor.getCUSTOM_NAME(), Optional.of(name.append(" ").append(healthbar)));
 
                 Collections.addAll(trackedValues,visibleTag, healthTag);
                 ((EntityTrackerUpdateS2CPacketAccessor) packet).setTrackedValues(trackedValues);

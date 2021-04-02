@@ -1,10 +1,12 @@
 package org.samo_lego.healthcare.healthbar;
 
-public interface HealthbarPreferences {
-    Enum<HealthbarStyles> getHealthbarStyle();
-    void setHealthbarStyle(Enum<HealthbarStyles> healthbarStyle);
+import net.minecraft.text.MutableText;
 
-    String getHealth(float health, float maxHealth);
+public interface HealthbarPreferences {
+    Enum<HealthbarStyle> getHealthbarStyle();
+    void setHealthbarStyle(Enum<HealthbarStyle> healthbarStyle);
+
+    MutableText getHealth(float health, float maxHealth);
 
     void setEnabled(boolean enabled);
     boolean isEnabled();

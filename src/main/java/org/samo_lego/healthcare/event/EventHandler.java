@@ -2,6 +2,7 @@ package org.samo_lego.healthcare.event;
 
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.samo_lego.healthcare.healthbar.HealthbarPreferences;
 
 public class EventHandler implements ServerPlayerEvents.CopyFrom {
 
@@ -14,6 +15,7 @@ public class EventHandler implements ServerPlayerEvents.CopyFrom {
      */
     @Override
     public void copyFromPlayer(ServerPlayerEntity oldPlayer, ServerPlayerEntity newPlayer, boolean alive) {
-
+        ((HealthbarPreferences) newPlayer).setHealthbarStyle(((HealthbarPreferences) oldPlayer).getHealthbarStyle());
+        ((HealthbarPreferences) newPlayer).setEnabled(((HealthbarPreferences) oldPlayer).isEnabled());
     }
 }
