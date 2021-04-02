@@ -5,7 +5,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.util.Formatting;
-import org.samo_lego.healthcare.healthbar.HealthbarStyle;
 import org.samo_lego.healthcare.healthbar.HealthbarPreferences;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,7 +15,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
 
     private Enum<HealthbarStyle> healthbarStyle = HealthbarStyle.PERCENTAGE;
-    private boolean enabled = false;
+    private boolean enabled = true;
+    private boolean alwaysVisible = false;
+
+    private int customFullChar = 9632; // '■'
+    private int customEmptyChar = 9633; // '□'
 
     @Override
     public Enum<HealthbarStyle> getHealthbarStyle() {
@@ -30,23 +33,35 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
 
     @Override
     public MutableText getHealth(float health, float maxHealth) {
-
         String first, second;
-        if(HealthbarStyle.HEARTS.equals(this.healthbarStyle)) {
-            // We ceil the number to not show 0 hearts if entity has like 0.2f health
-            int heartCount = maxHealth < 10 ? (int) maxHealth : 10;
-            int fullHearts = (int) Math.ceil(health * heartCount / maxHealth);
-
-            first = new String(new char[fullHearts]).replace('\0', (char) 9829); // ♥
-            second = new String(new char[heartCount - fullHearts]).replace('\0', (char) 9825); // ♡
-        } else if(HealthbarStyle.PERCENTAGE.equals(this.healthbarStyle)) {
-            first = String.valueOf(Math.round(health * 100.0F / maxHealth)).concat("%");
-            second = "";
-        } else {
+        if(this.healthbarStyle.equals(HealthbarStyle.NUMBER)) {
             // Number
             // * 100 / 100 for rounding
             first = String.valueOf((float) Math.round(health * 100.0F) / 100.0F);
             second = "/" + maxHealth;
+        } else if(HealthbarStyle.PERCENTAGE.equals(this.healthbarStyle)) {
+            first = String.valueOf(Math.round(health * 100.0F / maxHealth)).concat("%");
+            second = "";
+        } else {
+            int heartCount, fullHearts;
+            char full, empty;
+            if(this.healthbarStyle.equals(HealthbarStyle.LINES)) {
+                heartCount = maxHealth < 20 ? (int) maxHealth : 20;
+                fullHearts = (int) Math.ceil(health * heartCount / maxHealth);
+
+                empty = '|';
+                full = '|';
+            } else { // Hearts
+                // We ceil the number to not show 0 hearts if entity has like 0.2f health
+                heartCount = maxHealth < 10 ? (int) maxHealth : 10;
+                fullHearts = (int) Math.ceil(health * heartCount / maxHealth);
+
+                full = (char) (this.healthbarStyle.equals(HealthbarStyle.HEARTS) ? 9829 : this.customFullChar); // ♥ or custom
+                empty = (char) (this.healthbarStyle.equals(HealthbarStyle.HEARTS) ? 9825 : this.customEmptyChar); // ♡ or custom
+            }
+
+            first = new String(new char[fullHearts]).replace('\0', full);
+            second = new String(new char[heartCount - fullHearts]).replace('\0', empty);
         }
 
         return new LiteralText(first).formatted(Formatting.RED).append(new LiteralText(second).formatted(Formatting.GRAY));
@@ -62,11 +77,45 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
         return this.enabled;
     }
 
+    @Override
+    public void setAlwaysVisible(boolean alwaysVisible) {
+        this.alwaysVisible = alwaysVisible;
+    }
+
+    @Override
+    public boolean isAlwaysVisible() {
+        return this.alwaysVisible;
+    }
+
+    @Override
+    public void setCustomEmptyChar(int customEmptyChar) {
+        this.customEmptyChar = customEmptyChar;
+    }
+
+    @Override
+    public int getCustomEmptyChar() {
+        return this.customEmptyChar;
+    }
+
+    @Override
+    public void setCustomFullChar(int customFullChar) {
+        this.customFullChar = customFullChar;
+    }
+
+    @Override
+    public int getCustomFullChar() {
+        return this.customFullChar;
+    }
+
     @Inject(method = "writeCustomDataToTag", at = @At("TAIL"))
     private void writeCustomDataToTag(CompoundTag tag, CallbackInfo ci) {
         CompoundTag healthbar = new CompoundTag();
         healthbar.putString("Style", this.healthbarStyle.toString());
         healthbar.putBoolean("Enabled", this.enabled);
+        if(this.healthbarStyle.equals(HealthbarStyle.CUSTOM)) {
+            healthbar.putInt("CustomFullChar", this.customFullChar);
+            healthbar.putInt("CustomEmptyChar", this.customEmptyChar);
+        }
         tag.put("Healthbar", healthbar);
     }
 
@@ -76,6 +125,11 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
             CompoundTag healthbar = tag.getCompound("Healthbar");
             this.healthbarStyle = HealthbarStyle.valueOf(healthbar.getString("Style"));
             this.enabled = healthbar.getBoolean("Enabled");
+
+            if(this.healthbarStyle.equals(HealthbarStyle.CUSTOM)) {
+                this.customFullChar = healthbar.getInt("CustomFullChar");
+                this.customEmptyChar = healthbar.getInt("CustomEmptyChar");
+            }
         }
     }
 }

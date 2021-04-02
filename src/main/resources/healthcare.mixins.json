@@ -7,8 +7,7 @@
     "EntityAccessor",
     "EntityTrackerUpdateS2CPacketAccessor",
     "PlayerEntityMixinCast_Preferences",
-    "ServerPlayNetworkHandlerMixin_HealthTag",
-    "TmpEntityMixin"
+    "ServerPlayNetworkHandlerMixin_HealthTag"
   ],
   "client": [],
   "injectors": {

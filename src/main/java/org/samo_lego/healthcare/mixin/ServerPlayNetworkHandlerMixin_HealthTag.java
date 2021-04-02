@@ -1,5 +1,6 @@
 package org.samo_lego.healthcare.mixin;
 
+import com.google.common.collect.Lists;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import net.minecraft.entity.Entity;
@@ -20,10 +21,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Mixin(ServerPlayNetworkHandler.class)
 public class ServerPlayNetworkHandlerMixin_HealthTag {
@@ -53,16 +51,13 @@ public class ServerPlayNetworkHandlerMixin_HealthTag {
                 float health = living.getHealth();
                 float maxHealth = living.getMaxHealth();
 
-                try {
-                    System.out.println("Has name: " + entity.hasCustomName());
-                } catch(NullPointerException ignored) {
-                }
-                MutableText name = entity.hasCustomName() ?  (MutableText) entity.getCustomName() : new TranslatableText(entity.getType().getTranslationKey());
+                // @SpaceClouds42 saved me here, `.copy()` after getting custom name is essential!
+                MutableText name = entity.hasCustomName() ? entity.getCustomName().copy() : new TranslatableText(entity.getType().getTranslationKey());
 
                 Text healthbar = ((HealthbarPreferences) this.player).getHealth(health, maxHealth);
                 DataTracker.Entry<Optional<Text>> healthTag = new DataTracker.Entry<>(EntityAccessor.getCUSTOM_NAME(), Optional.of(name.append(" ").append(healthbar)));
 
-                Collections.addAll(trackedValues,visibleTag, healthTag);
+                Collections.addAll(trackedValues, visibleTag, healthTag);
                 ((EntityTrackerUpdateS2CPacketAccessor) packet).setTrackedValues(trackedValues);
             }
         }

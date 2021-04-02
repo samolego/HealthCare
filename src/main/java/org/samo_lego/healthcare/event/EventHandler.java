@@ -17,5 +17,9 @@ public class EventHandler implements ServerPlayerEvents.CopyFrom {
     public void copyFromPlayer(ServerPlayerEntity oldPlayer, ServerPlayerEntity newPlayer, boolean alive) {
         ((HealthbarPreferences) newPlayer).setHealthbarStyle(((HealthbarPreferences) oldPlayer).getHealthbarStyle());
         ((HealthbarPreferences) newPlayer).setEnabled(((HealthbarPreferences) oldPlayer).isEnabled());
+        ((HealthbarPreferences) newPlayer).setAlwaysVisible(((HealthbarPreferences) oldPlayer).isAlwaysVisible());
+
+        ((HealthbarPreferences) newPlayer).setCustomFullChar(((HealthbarPreferences) oldPlayer).getCustomFullChar());
+        ((HealthbarPreferences) newPlayer).setCustomEmptyChar(((HealthbarPreferences) oldPlayer).getCustomEmptyChar());
     }
 }
