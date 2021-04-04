@@ -27,11 +27,21 @@ public class HealthConfig {
     ));
 
     public final Permissions perms = new Permissions();
+
+    public final String _comment_maxHealthbarLength = "// Max length of healthbar a player can use.";
     public int maxHealthbarLength = 20;
 
     public static final class Permissions {
         public final String _comment = "// Enabled only if LuckPerms is loaded.";
         public final String healthcare_reloadConfig = "healthcare.reloadConfig";
+
+        public final String _comment_playerPermissions = "// Player permissions";
+        public final String healthbar_toggle = "healthcare.healthbar.toggle";
+        public final String healthbar_edit_style = "healthcare.healthbar.edit.style";
+        public final String healthbar_edit_visibility = "healthcare.healthbar.edit.visibility";
+        public final String healthbar_edit_custom_length = "healthcare.healthbar.edit.custom.length";
+        public final String healthbar_edit_custom_symbols_full = "healthcare.healthbar.edit.symbol.full";
+        public final String healthbar_edit_custom_symbols_empty = "healthcare.healthbar.edit.symbol.empty";
     }
 
     public Language lang = new Language();

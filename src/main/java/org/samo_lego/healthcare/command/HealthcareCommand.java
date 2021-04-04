@@ -25,7 +25,7 @@ public class HealthcareCommand {
     }
 
     private static int reloadConfig(CommandContext<ServerCommandSource> ctx) {
-        if(LUCKPERMS_LOADED && !PermissionHelper.checkPermission(ctx.getSource(), config.perms.healthcare_reloadConfig)) {
+        if(LUCKPERMS_LOADED && !PermissionHelper.checkPermission(ctx.getSource(), config.perms.healthcare_reloadConfig, 4)) {
             ctx.getSource().sendError(new LiteralText(config.lang.noPermission).formatted(Formatting.RED));
             return -1;
         }

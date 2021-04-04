@@ -9,13 +9,13 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.MessageArgumentType;
-import net.minecraft.command.argument.NumberRangeArgumentType;
 import net.minecraft.command.suggestion.SuggestionProviders;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import org.samo_lego.healthcare.healthbar.HealthbarPreferences;
+import org.samo_lego.healthcare.permission.PermissionHelper;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -25,8 +25,7 @@ import static com.mojang.brigadier.arguments.StringArgumentType.word;
 import static net.minecraft.command.argument.MessageArgumentType.message;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
-import static org.samo_lego.healthcare.HealthCare.MODID;
-import static org.samo_lego.healthcare.HealthCare.config;
+import static org.samo_lego.healthcare.HealthCare.*;
 
 public class HealthbarCommand {
     private static final SuggestionProvider<ServerCommandSource> HEALTHBAR_STYLES;
@@ -39,6 +38,11 @@ public class HealthbarCommand {
                                 .then(argument("style", word())
                                         .suggests(HEALTHBAR_STYLES)
                                         .executes(HealthbarCommand::editHealthbarStyle)
+                                )
+                        )
+                        .then(literal("alwaysVisible")
+                                .then(argument("visibility", BoolArgumentType.bool())
+                                        .executes(HealthbarCommand::changeVisibility)
                                 )
                         )
                         .then(literal("custom")
@@ -58,16 +62,16 @@ public class HealthbarCommand {
                                     )
                             )
                         )
-                        .then(literal("alwaysVisible")
-                            .then(argument("visibility", BoolArgumentType.bool())
-                                .executes(HealthbarCommand::changeVisibility)
-                            )
-                        )
                 )
         );
     }
 
     private static int editHealthbarLength(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        if(LUCKPERMS_LOADED && !PermissionHelper.checkPermission(context.getSource(), config.perms.healthbar_edit_custom_length, 0)) {
+            context.getSource().sendError(new LiteralText(config.lang.noPermission).formatted(Formatting.RED));
+            return -1;
+        }
+
         HealthbarPreferences preferences = (HealthbarPreferences) context.getSource().getPlayer();
         int length = IntegerArgumentType.getInteger(context, "length");
         preferences.setCustomLength(length);
@@ -87,6 +91,11 @@ public class HealthbarCommand {
     }
 
     private static int setSymbol(CommandContext<ServerCommandSource> context, boolean full) throws CommandSyntaxException {
+        if(LUCKPERMS_LOADED && !PermissionHelper.checkPermission(context.getSource(), full ? config.perms.healthbar_edit_custom_symbols_full : config.perms.healthbar_edit_custom_symbols_empty, 0)) {
+            context.getSource().sendError(new LiteralText(config.lang.noPermission).formatted(Formatting.RED));
+            return -1;
+        }
+
         HealthbarPreferences preferences = (HealthbarPreferences) context.getSource().getPlayer();
         char symbol = MessageArgumentType.getMessage(context, "symbol").getString().toCharArray()[0];
 
@@ -110,6 +119,11 @@ public class HealthbarCommand {
     }
 
     private static int changeVisibility(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        if(LUCKPERMS_LOADED && !PermissionHelper.checkPermission(context.getSource(), config.perms.healthbar_edit_visibility, 0)) {
+            context.getSource().sendError(new LiteralText(config.lang.noPermission).formatted(Formatting.RED));
+            return -1;
+        }
+
         HealthbarPreferences preferences = (HealthbarPreferences) context.getSource().getPlayer();
         boolean alwaysVisible = BoolArgumentType.getBool(context, "visibility");
 
@@ -123,6 +137,11 @@ public class HealthbarCommand {
     }
 
     private static int editHealthbarStyle(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        if(LUCKPERMS_LOADED && !PermissionHelper.checkPermission(context.getSource(), config.perms.healthbar_edit_style, 0)) {
+            context.getSource().sendError(new LiteralText(config.lang.noPermission).formatted(Formatting.RED));
+            return -1;
+        }
+
         HealthbarPreferences preferences = (HealthbarPreferences) context.getSource().getPlayer();
         Enum<HealthbarPreferences.HealthbarStyle> style = HealthbarPreferences.HealthbarStyle.valueOf(StringArgumentType.getString(context, "style"));
 
@@ -136,6 +155,11 @@ public class HealthbarCommand {
     }
 
     private static int toggleHealthBar(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        if(LUCKPERMS_LOADED && !PermissionHelper.checkPermission(context.getSource(), config.perms.healthbar_toggle, 0)) {
+            context.getSource().sendError(new LiteralText(config.lang.noPermission).formatted(Formatting.RED));
+            return -1;
+        }
+
         HealthbarPreferences preferences = (HealthbarPreferences) context.getSource().getPlayer();
         preferences.setEnabled(!preferences.isEnabled());
 
