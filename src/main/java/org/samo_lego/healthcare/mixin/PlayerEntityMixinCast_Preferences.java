@@ -20,6 +20,7 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
 
     private int customFullChar = 9632; // '■'
     private int customEmptyChar = 9633; // '□'
+    private int customLength = 10;
 
     @Override
     public Enum<HealthbarStyle> getHealthbarStyle() {
@@ -53,7 +54,8 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
                 full = '|';
             } else { // Hearts
                 // We ceil the number to not show 0 hearts if entity has like 0.2f health
-                heartCount = maxHealth < 10 ? (int) maxHealth : 10;
+                int length = this.healthbarStyle == HealthbarStyle.CUSTOM ? customLength : 10;
+                heartCount = maxHealth < length ? (int) maxHealth : length;
                 fullHearts = (int) Math.ceil(health * heartCount / maxHealth);
 
                 full = (char) (this.healthbarStyle.equals(HealthbarStyle.HEARTS) ? 9829 : this.customFullChar); // ♥ or custom
@@ -107,6 +109,16 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
         return this.customFullChar;
     }
 
+    @Override
+    public void setCustomLength(int length) {
+        this.customLength = length;
+    }
+
+    @Override
+    public int getCustomLength() {
+        return this.customLength;
+    }
+
     @Inject(method = "writeCustomDataToTag", at = @At("TAIL"))
     private void writeCustomDataToTag(CompoundTag tag, CallbackInfo ci) {
         CompoundTag healthbar = new CompoundTag();
@@ -115,6 +127,7 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
         if(this.healthbarStyle.equals(HealthbarStyle.CUSTOM)) {
             healthbar.putInt("CustomFullChar", this.customFullChar);
             healthbar.putInt("CustomEmptyChar", this.customEmptyChar);
+            healthbar.putInt("Length", this.customLength);
         }
         tag.put("Healthbar", healthbar);
     }
@@ -129,6 +142,7 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
             if(this.healthbarStyle.equals(HealthbarStyle.CUSTOM)) {
                 this.customFullChar = healthbar.getInt("CustomFullChar");
                 this.customEmptyChar = healthbar.getInt("CustomEmptyChar");
+                this.customLength = healthbar.getInt("Length");
             }
         }
     }

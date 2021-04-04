@@ -30,6 +30,9 @@ public interface HealthbarPreferences {
     void setCustomFullChar(int customFullChar);
     int getCustomFullChar();
 
+    void setCustomLength(int length);
+    int getCustomLength();
+
     enum HealthbarStyle {
         PERCENTAGE,
         HEARTS,

@@ -21,5 +21,6 @@ public class EventHandler implements ServerPlayerEvents.CopyFrom {
 
         ((HealthbarPreferences) newPlayer).setCustomFullChar(((HealthbarPreferences) oldPlayer).getCustomFullChar());
         ((HealthbarPreferences) newPlayer).setCustomEmptyChar(((HealthbarPreferences) oldPlayer).getCustomEmptyChar());
+        ((HealthbarPreferences) newPlayer).setCustomLength(((HealthbarPreferences) oldPlayer).getCustomLength());
     }
 }

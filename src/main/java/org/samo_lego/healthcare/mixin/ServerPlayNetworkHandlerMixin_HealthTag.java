@@ -1,6 +1,5 @@
 package org.samo_lego.healthcare.mixin;
 
-import com.google.common.collect.Lists;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import net.minecraft.entity.Entity;
@@ -10,10 +9,10 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.registry.Registry;
 import org.samo_lego.healthcare.healthbar.HealthbarPreferences;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -21,7 +20,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static org.samo_lego.healthcare.HealthCare.config;
 
 @Mixin(ServerPlayNetworkHandler.class)
 public class ServerPlayNetworkHandlerMixin_HealthTag {
@@ -39,12 +42,18 @@ public class ServerPlayNetworkHandlerMixin_HealthTag {
             List<DataTracker.Entry<?>> trackedValues = ((EntityTrackerUpdateS2CPacketAccessor) packet).getTrackedValues();
 
             Entity entity = this.player.getServerWorld().getEntityById(((EntityTrackerUpdateS2CPacketAccessor) packet).getId());
-            if(entity instanceof LivingEntity && ((HealthbarPreferences) this.player).isEnabled() && !(entity instanceof ServerPlayerEntity)) {
+
+            if(
+                    entity instanceof LivingEntity &&
+                    ((HealthbarPreferences) this.player).isEnabled() &&
+                    !(entity instanceof ServerPlayerEntity) &&
+                    !config.blacklistedEntities.contains(Registry.ENTITY_TYPE.getId(entity.getType()).toString())
+            ) {
                 // Removing current custom name
                 trackedValues.removeIf(value -> value.getData().getId() == 2);
 
                 // Ensure name is visible only if mob is not too far away
-                boolean visible = entity.distanceTo(player) < 8.0F || entity.isCustomNameVisible();
+                boolean visible = entity.distanceTo(player) < 8.0F || entity.isCustomNameVisible() && ((HealthbarPreferences) player).isAlwaysVisible();
                 DataTracker.Entry<Boolean> visibleTag = new DataTracker.Entry<>(EntityAccessor.getNAME_VISIBLE(), visible);
 
                 LivingEntity living = (LivingEntity) entity;
