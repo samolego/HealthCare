@@ -53,7 +53,7 @@ public class ServerPlayNetworkHandlerMixin_HealthTag {
                 trackedValues.removeIf(value -> value.getData().getId() == 2);
 
                 // Ensure name is visible only if mob is not too far away
-                boolean visible = entity.distanceTo(player) < 8.0F || entity.isCustomNameVisible() && ((HealthbarPreferences) player).isAlwaysVisible();
+                boolean visible = (entity.distanceTo(player) < 8.0F || entity.isCustomNameVisible()) && ((HealthbarPreferences) player).isAlwaysVisible();
                 DataTracker.Entry<Boolean> visibleTag = new DataTracker.Entry<>(EntityAccessor.getNAME_VISIBLE(), visible);
 
                 LivingEntity living = (LivingEntity) entity;
