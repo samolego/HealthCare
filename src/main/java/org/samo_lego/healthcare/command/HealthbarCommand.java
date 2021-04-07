@@ -77,7 +77,10 @@ public class HealthbarCommand {
         preferences.setCustomLength(length);
 
         context.getSource().sendFeedback(
-                new LiteralText(String.format(config.lang.customLengthSet, length)).formatted(Formatting.GREEN),
+                new LiteralText(String.format(config.lang.customLengthSet, length))
+                    .formatted(Formatting.GREEN)
+                    .append("\n")
+                    .append(new LiteralText(config.lang.reloadRequired).formatted(Formatting.GOLD)),
                 false
         );
         if(!preferences.getHealthbarStyle().equals(HealthbarPreferences.HealthbarStyle.CUSTOM)) {
@@ -105,7 +108,10 @@ public class HealthbarCommand {
             preferences.setCustomEmptyChar(symbol);
 
         context.getSource().sendFeedback(
-                new LiteralText(String.format(config.lang.customSymbolSet, full ? "Full" : "Empty" ,symbol)).formatted(Formatting.GREEN),
+                new LiteralText(String.format(config.lang.customSymbolSet, full ? "Full" : "Empty", symbol))
+                    .formatted(Formatting.GREEN)
+                    .append("\n")
+                    .append(new LiteralText(config.lang.reloadRequired).formatted(Formatting.GOLD)),
                 false
         );
         if(!preferences.getHealthbarStyle().equals(HealthbarPreferences.HealthbarStyle.CUSTOM)) {
@@ -130,7 +136,10 @@ public class HealthbarCommand {
         preferences.setAlwaysVisible(alwaysVisible);
 
         context.getSource().sendFeedback(
-                new LiteralText(String.format(config.lang.visibilitySet, alwaysVisible)).formatted(Formatting.GREEN),
+                new LiteralText(String.format(config.lang.visibilitySet, alwaysVisible))
+                    .formatted(Formatting.GREEN)
+                    .append("\n")
+                    .append(new LiteralText(config.lang.reloadRequired).formatted(Formatting.GOLD)),
                 false
         );
         return 0;
@@ -148,7 +157,10 @@ public class HealthbarCommand {
         preferences.setHealthbarStyle(style);
 
         context.getSource().sendFeedback(
-                new LiteralText(String.format(config.lang.styleSet, style.toString())).formatted(Formatting.GREEN),
+                new LiteralText(String.format(config.lang.styleSet, style.toString()))
+                    .formatted(Formatting.GREEN)
+                    .append("\n")
+                    .append(new LiteralText(config.lang.reloadRequired).formatted(Formatting.GOLD)),
                 false
         );
         return 0;
@@ -164,7 +176,10 @@ public class HealthbarCommand {
         preferences.setEnabled(!preferences.isEnabled());
 
         context.getSource().sendFeedback(
-                new LiteralText(preferences.isEnabled() ? config.lang.healthbarEnabled : config.lang.healthbarDisabled).formatted(Formatting.GREEN),
+                new LiteralText(preferences.isEnabled() ? config.lang.healthbarEnabled : config.lang.healthbarDisabled)
+                    .formatted(Formatting.GREEN)
+                    .append("\n")
+                    .append(new LiteralText(config.lang.reloadRequired).formatted(Formatting.GOLD)),
                 false
         );
 

@@ -25,6 +25,8 @@ public class HealthConfig {
             "taterzens:npc",
             "specialmobs:mob_with_hidden_health"
     ));
+    public String _comment_activationRange = "// When to activate the healthbar.";
+    public float activationRange = 8.0F;
 
     public final Permissions perms = new Permissions();
 
@@ -56,6 +58,7 @@ public class HealthConfig {
         public String useCustomStyle = "Make sure to use style CUSTOM to have your settings applied.";
         public String healthbarEnabled = "Healthbars are now enabled.";
         public String healthbarDisabled = "Healthbars are now disabled.";
+        public String reloadRequired = "Changes will be visible after relogging or entity update.";
     }
 
     /**

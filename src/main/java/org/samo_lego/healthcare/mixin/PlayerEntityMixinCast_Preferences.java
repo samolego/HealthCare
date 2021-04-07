@@ -14,6 +14,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(PlayerEntity.class)
 public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
 
+    private final PlayerEntity player = (PlayerEntity) (Object) this;
+
     private Enum<HealthbarStyle> healthbarStyle = HealthbarStyle.PERCENTAGE;
     private boolean enabled = true;
     private boolean alwaysVisible = false;
@@ -34,6 +36,12 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
 
     @Override
     public MutableText getHealth(float health, float maxHealth) {
+        if(health < 0.0F) {
+            health = 0.0F;
+        }
+        if(maxHealth <= 0.0F) {
+            maxHealth = 1.0F;
+        }
         String first, second;
         if(this.healthbarStyle.equals(HealthbarStyle.NUMBER)) {
             // Number

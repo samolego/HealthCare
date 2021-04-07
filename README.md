@@ -4,6 +4,7 @@
 [![GitHub license](https://img.shields.io/github/license/samolego/HealthCare?style=flat-square)](https://github.com/samolego/HealthCare/blob/master/LICENSE)
 [![Server environment](https://img.shields.io/badge/Environment-server-blue?style=flat-square)](https://github.com/samolego/HealthCare)
 [![Singleplayer environment](https://img.shields.io/badge/Environment-singleplayer-yellow?style=flat-square)](https://github.com/samolego/HealthCare)
+[![Discord invite](https://img.shields.io/badge/ModdedFaBrick-Discord-7289DA?logo=discord&logoColor=white&style=flat-square)](https://discord.com/channels/797713290545332235/797713588298973224/797786429232906240)
 
 Features custom health icons, customisable length etc. (all **per-player**)
 

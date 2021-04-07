@@ -5,6 +5,7 @@ import io.netty.util.concurrent.GenericFutureListener;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -46,14 +47,14 @@ public class ServerPlayNetworkHandlerMixin_HealthTag {
             if(
                     entity instanceof LivingEntity &&
                     ((HealthbarPreferences) this.player).isEnabled() &&
-                    !(entity instanceof ServerPlayerEntity) &&
+                    !(entity instanceof PlayerEntity) &&
                     !config.blacklistedEntities.contains(Registry.ENTITY_TYPE.getId(entity.getType()).toString())
             ) {
                 // Removing current custom name
                 trackedValues.removeIf(value -> value.getData().getId() == 2);
 
                 // Ensure name is visible only if mob is not too far away
-                boolean visible = (entity.distanceTo(player) < 8.0F || entity.isCustomNameVisible()) && ((HealthbarPreferences) player).isAlwaysVisible();
+                boolean visible = (entity.distanceTo(player) < config.activationRange || entity.isCustomNameVisible()) && ((HealthbarPreferences) player).isAlwaysVisible();
                 DataTracker.Entry<Boolean> visibleTag = new DataTracker.Entry<>(EntityAccessor.getNAME_VISIBLE(), visible);
 
                 LivingEntity living = (LivingEntity) entity;
