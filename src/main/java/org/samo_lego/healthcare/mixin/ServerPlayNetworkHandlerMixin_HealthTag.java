@@ -64,7 +64,7 @@ public class ServerPlayNetworkHandlerMixin_HealthTag {
                 // @SpaceClouds42 saved me here, `.copy()` after getting custom name is essential!
                 MutableText name = entity.hasCustomName() ? entity.getCustomName().copy() : new TranslatableText(entity.getType().getTranslationKey());
 
-                Text healthbar = ((HealthbarPreferences) this.player).getHealth(health, maxHealth);
+                Text healthbar = ((HealthbarPreferences) this.player).getHealthbarText(health, maxHealth);
                 DataTracker.Entry<Optional<Text>> healthTag = new DataTracker.Entry<>(EntityAccessor.getCUSTOM_NAME(), Optional.of(name.append(" ").append(healthbar)));
 
                 Collections.addAll(trackedValues, visibleTag, healthTag);

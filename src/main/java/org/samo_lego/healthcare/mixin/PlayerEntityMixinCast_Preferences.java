@@ -35,13 +35,17 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
     }
 
     @Override
-    public MutableText getHealth(float health, float maxHealth) {
+    public MutableText getHealthbarText(float health, float maxHealth) {
         if(health < 0.0F) {
             health = 0.0F;
         }
         if(maxHealth <= 0.0F) {
             maxHealth = 1.0F;
         }
+        if(health > maxHealth) {
+            maxHealth = health;
+        }
+
         String first, second;
         if(this.healthbarStyle.equals(HealthbarStyle.NUMBER)) {
             // Number
@@ -55,20 +59,21 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
             int heartCount, fullHearts;
             char full, empty;
             if(this.healthbarStyle.equals(HealthbarStyle.LINES)) {
-                heartCount = maxHealth < 20 ? (int) maxHealth : 20;
-                fullHearts = (int) Math.ceil(health * heartCount / maxHealth);
+                heartCount = maxHealth < 20 ? (int) Math.ceil(maxHealth) : 20;
 
                 empty = '|';
                 full = '|';
             } else { // Hearts
                 // We ceil the number to not show 0 hearts if entity has like 0.2f health
                 int length = this.healthbarStyle == HealthbarStyle.CUSTOM ? customLength : 10;
-                heartCount = maxHealth < length ? (int) maxHealth : length;
-                fullHearts = (int) Math.ceil(health * heartCount / maxHealth);
+                heartCount = maxHealth < length ? (int) Math.ceil(maxHealth) : length;
 
                 full = (char) (this.healthbarStyle.equals(HealthbarStyle.HEARTS) ? 9829 : this.customFullChar); // ♥ or custom
                 empty = (char) (this.healthbarStyle.equals(HealthbarStyle.HEARTS) ? 9825 : this.customEmptyChar); // ♡ or custom
             }
+
+            // Hearts that should be colored red
+            fullHearts = (int) Math.ceil(health * heartCount / maxHealth);
 
             first = new String(new char[fullHearts]).replace('\0', full);
             second = new String(new char[heartCount - fullHearts]).replace('\0', empty);
@@ -119,7 +124,8 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
 
     @Override
     public void setCustomLength(int length) {
-        this.customLength = length;
+        if(length >= 0) // Don't allow negative length
+            this.customLength = length;
     }
 
     @Override
@@ -132,6 +138,7 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
         CompoundTag healthbar = new CompoundTag();
         healthbar.putString("Style", this.healthbarStyle.toString());
         healthbar.putBoolean("Enabled", this.enabled);
+        healthbar.putBoolean("AlwaysVisible", this.alwaysVisible);
         if(this.healthbarStyle.equals(HealthbarStyle.CUSTOM)) {
             healthbar.putInt("CustomFullChar", this.customFullChar);
             healthbar.putInt("CustomEmptyChar", this.customEmptyChar);
@@ -146,6 +153,7 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
             CompoundTag healthbar = tag.getCompound("Healthbar");
             this.healthbarStyle = HealthbarStyle.valueOf(healthbar.getString("Style"));
             this.enabled = healthbar.getBoolean("Enabled");
+            this.alwaysVisible = healthbar.getBoolean("AlwaysVisible");
 
             if(this.healthbarStyle.equals(HealthbarStyle.CUSTOM)) {
                 this.customFullChar = healthbar.getInt("CustomFullChar");

@@ -16,7 +16,7 @@ public interface HealthbarPreferences {
      * @param maxHealth max health
      * @return formatted mutable text with health info
      */
-    MutableText getHealth(float health, float maxHealth);
+    MutableText getHealthbarText(float health, float maxHealth);
 
     void setEnabled(boolean enabled);
     boolean isEnabled();
