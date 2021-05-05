@@ -6,6 +6,8 @@
 [![Singleplayer environment](https://img.shields.io/badge/Environment-singleplayer-yellow?style=flat-square)](https://github.com/samolego/HealthCare)
 [![Discord invite](https://img.shields.io/badge/ModdedFaBrick-Discord-7289DA?logo=discord&logoColor=white&style=flat-square)](https://discord.com/channels/797713290545332235/797713588298973224/797786429232906240)
 
+<img src="https://i.imgur.com/Ol1Tcf8.png" alt="Requires FAPI" width="300px">
+
 Features custom health icons, customisable length etc. (all **per-player**)
 
 <img src="https://user-images.githubusercontent.com/34912839/113518367-30b11500-9586-11eb-8907-9af0e5bcb255.png" width="300px">
