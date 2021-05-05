@@ -21,9 +21,6 @@ repositories {
 	maven {
 		url 'https://jitpack.io'
 	}
-	maven {
-		url 'https://dl.bintray.com/bymartrixx/maven'
-	}
 }
 
 def ENV = System.getenv()
@@ -40,8 +37,8 @@ dependencies {
 	// LuckPerms
 	modImplementation 'me.lucko:fabric-permissions-api:0.1-SNAPSHOT'
 
-	// Why did my command fail
-	modImplementation 'io.github.bymartrixx.wdmcf:wdmcf:1.0.1'
+	modRuntime "com.github.CaffeineMC:hydrogen-fabric:mc1.16.5-v0.2.0"
+	modRuntime "com.github.astei:lazydfu:0.1.2"
 }
 
 processResources {

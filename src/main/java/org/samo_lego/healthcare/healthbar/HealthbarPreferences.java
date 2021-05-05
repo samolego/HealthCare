@@ -38,6 +38,7 @@ public interface HealthbarPreferences {
         HEARTS,
         NUMBER,
         LINES,
+        SKYBLOCK, // see https://github.com/samolego/HealthCare/issues/2
         CUSTOM
     }
 }
