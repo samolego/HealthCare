@@ -55,10 +55,10 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
             return new LiteralText(first)
                     .formatted(health > maxHealth / 2 ? Formatting.GREEN : Formatting.YELLOW)
                     .append(new LiteralText("/")
-                        .formatted(Formatting.RESET))
+                        .formatted(Formatting.WHITE))
                     .append(new LiteralText(second)
                         .formatted(Formatting.GREEN))
-                    .append(new LiteralText(String.valueOf((char) 9829))
+                    .append(new LiteralText(String.valueOf((char) 10084)) // ❤
                             .formatted(Formatting.RED));
         } else if(this.healthbarStyle.equals(HealthbarStyle.NUMBER)) {
             // Number
@@ -93,7 +93,7 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
         }
 
         return new LiteralText(first)
-                .formatted(health > maxHealth / 2 ? Formatting.GREEN : Formatting.YELLOW)
+                .formatted(Formatting.RED) /*health > maxHealth / 3 ? (health > maxHealth * 1.5F ? Formatting.YELLOW : Formatting.GOLD) : */
                 .append(new LiteralText(second).formatted(Formatting.GRAY));
     }
 
