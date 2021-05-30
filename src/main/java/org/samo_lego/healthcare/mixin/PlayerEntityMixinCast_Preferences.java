@@ -48,7 +48,8 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
 
         String first, second;
         if(this.healthbarStyle.equals(HealthbarStyle.SKYBLOCK)) {
-            first = String.valueOf((float) Math.round(health * 100.0F) / 100.0F);
+            // String.format("%.2f", health) for rounding
+            first = String.format("%.2f", health);
             second = String.valueOf((int) Math.ceil(maxHealth));
 
             // We return it here because of custom formatting
@@ -62,11 +63,11 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
                             .formatted(Formatting.RED));
         } else if(this.healthbarStyle.equals(HealthbarStyle.NUMBER)) {
             // Number
-            // * 100 / 100 for rounding
-            first = String.valueOf((float) Math.round(health * 100.0F) / 100.0F);
+            // String.format("%.2f", health) for rounding
+            first = String.format("%.2f", health);
             second = "/" + maxHealth;
         } else if(HealthbarStyle.PERCENTAGE.equals(this.healthbarStyle)) {
-            first = String.valueOf(Math.round(health * 100.0F / maxHealth)).concat("%");
+            first = String.format("%.2f", health * 100.0F / maxHealth).concat("%");
             second = "";
         } else {
             int heartCount, fullHearts;
