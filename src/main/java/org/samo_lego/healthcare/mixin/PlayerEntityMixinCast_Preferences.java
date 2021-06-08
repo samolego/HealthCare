@@ -1,7 +1,7 @@
 package org.samo_lego.healthcare.mixin;
 
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.util.Formatting;
@@ -149,9 +149,9 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
         return this.customLength;
     }
 
-    @Inject(method = "writeCustomDataToTag", at = @At("TAIL"))
-    private void writeCustomDataToTag(CompoundTag tag, CallbackInfo ci) {
-        CompoundTag healthbar = new CompoundTag();
+    @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
+    private void writeCustomDataToTag(NbtCompound tag, CallbackInfo ci) {
+        NbtCompound healthbar = new NbtCompound();
         healthbar.putString("Style", this.healthbarStyle.toString());
         healthbar.putBoolean("Enabled", this.enabled);
         healthbar.putBoolean("AlwaysVisible", this.alwaysVisible);
@@ -163,10 +163,10 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
         tag.put("Healthbar", healthbar);
     }
 
-    @Inject(method = "readCustomDataFromTag", at = @At("TAIL"))
-    private void readCustomDataFromTag(CompoundTag tag, CallbackInfo ci) {
+    @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
+    private void readCustomDataFromTag(NbtCompound tag, CallbackInfo ci) {
         if(tag.contains("Healthbar")) {
-            CompoundTag healthbar = tag.getCompound("Healthbar");
+            NbtCompound healthbar = tag.getCompound("Healthbar");
             this.healthbarStyle = HealthbarStyle.valueOf(healthbar.getString("Style"));
             this.enabled = healthbar.getBoolean("Enabled");
             this.alwaysVisible = healthbar.getBoolean("AlwaysVisible");
