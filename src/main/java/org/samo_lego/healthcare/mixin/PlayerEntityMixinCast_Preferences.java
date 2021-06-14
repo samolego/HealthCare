@@ -11,12 +11,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static org.samo_lego.healthcare.HealthCare.config;
+
 @Mixin(PlayerEntity.class)
 public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
 
-    private final PlayerEntity player = (PlayerEntity) (Object) this;
-
-    private Enum<HealthbarStyle> healthbarStyle = HealthbarStyle.PERCENTAGE;
+    private Enum<HealthbarStyle> healthbarStyle = config.defaultStyle;
     private boolean enabled = true;
     private boolean alwaysVisible = false;
 

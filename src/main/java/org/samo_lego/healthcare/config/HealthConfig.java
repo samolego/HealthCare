@@ -3,6 +3,7 @@ package org.samo_lego.healthcare.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
+import org.samo_lego.healthcare.healthbar.HealthbarPreferences;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -32,6 +33,10 @@ public class HealthConfig {
 
     public final String _comment_maxHealthbarLength = "// Max length of healthbar a player can use.";
     public int maxHealthbarLength = 20;
+
+    public final String _comment_defaultStyle1 = "// The default style of healthbar.";
+    public final String _comment_defaultStyle2 = "// Styles: " + Arrays.toString(HealthbarPreferences.HealthbarStyle.values());
+    public HealthbarPreferences.HealthbarStyle defaultStyle = HealthbarPreferences.HealthbarStyle.PERCENTAGE;
 
     public static final class Permissions {
         public final String _comment = "// Enabled only if LuckPerms is loaded.";
