@@ -19,17 +19,12 @@ public class HealthcareCommand {
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated) {
         dispatcher.register(literal("healthcare")
-                .requires(src -> src.hasPermissionLevel(4) || LUCKPERMS_LOADED)
+                .requires(src -> LUCKPERMS_LOADED ? PermissionHelper.checkPermission(src, config.perms.healthcare_reloadConfig, 4) : src.hasPermissionLevel(4))
             .then(literal("reloadConfig").executes(HealthcareCommand::reloadConfig))
         );
     }
 
     private static int reloadConfig(CommandContext<ServerCommandSource> ctx) {
-        if(LUCKPERMS_LOADED && !PermissionHelper.checkPermission(ctx.getSource(), config.perms.healthcare_reloadConfig, 4)) {
-            ctx.getSource().sendError(new LiteralText(config.lang.noPermission).formatted(Formatting.RED));
-            return -1;
-        }
-
         config = HealthConfig.loadConfigFile(new File(FabricLoader.getInstance().getConfigDir() + "/config.json"));
 
         ctx.getSource().sendFeedback(
