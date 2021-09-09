@@ -26,25 +26,34 @@ public class HealthConfig {
             "taterzens:npc",
             "specialmobs:mob_with_hidden_health"
     ));
-    public String _comment_activationRange = "// When to activate the healthbar.";
+    @SerializedName("// When to activate the healthbar.")
+    public String _comment_activationRange = "";
     public float activationRange = 8.0F;
 
     public final Permissions perms = new Permissions();
 
-    public final String _comment_maxHealthbarLength = "// Max length of healthbar a player can use.";
+    @SerializedName("// Max length of healthbar a player can use.")
+    public final String _comment_maxHealthbarLength = "";
     public int maxHealthbarLength = 20;
 
-    public final String _comment_defaultStyle1 = "// The default style of healthbar.";
-    public final String _comment_defaultStyle2 = "// Styles: " + Arrays.toString(HealthbarPreferences.HealthbarStyle.values());
+    @SerializedName("// Whether to show entity type next to health.")
+    public final String _comment_showType = "";
+    public boolean showType = true;
+
+    @SerializedName("// The default style of healthbar. The following are available")
+    public final String _comment_defaultStyle1 = Arrays.toString(HealthbarPreferences.HealthbarStyle.values());
     public HealthbarPreferences.HealthbarStyle defaultStyle = HealthbarPreferences.HealthbarStyle.PERCENTAGE;
 
     public static final class Permissions {
-        public final String _comment = "// Enabled only if LuckPerms is loaded.";
+        @SerializedName("// Enabled only if LuckPerms is loaded.")
+        public final String _comment = "";
         public final String healthcare_reloadConfig = "healthcare.reloadConfig";
 
-        public final String _comment_playerPermissions = "// Player permissions";
+        @SerializedName("// Player permissions")
+        public final String _comment_playerPermissions = "";
         public final String healthbar_toggle = "healthcare.healthbar.toggle";
         public final String healthbar_edit_style = "healthcare.healthbar.edit.style";
+        public final String healthbar_edit_showEntityType = "healthcare.healthbar.edit.show_entity_type";
         public final String healthbar_edit_visibility = "healthcare.healthbar.edit.visibility";
         public final String healthbar_edit_custom_length = "healthcare.healthbar.edit.custom.length";
         public final String healthbar_edit_custom_symbols_full = "healthcare.healthbar.edit.symbol.full";
@@ -53,7 +62,6 @@ public class HealthConfig {
 
     public Language lang = new Language();
     public static class Language {
-
         public String noPermission = "You don't have permission to run this command.";
         public String configReloaded = "Config was reloaded successfully.";
         public String customLengthSet = "Length of healthbar was set to %s.";
@@ -63,7 +71,8 @@ public class HealthConfig {
         public String useCustomStyle = "Make sure to use style CUSTOM to have your settings applied.";
         public String healthbarEnabled = "Healthbars are now enabled.";
         public String healthbarDisabled = "Healthbars are now disabled.";
-        public String reloadRequired = "Changes will be visible after relogging or entity update.";
+        public String reloadRequired = "Changes will be visible after relogging or entity update(s).";
+        public String toggledType = "Show-entity-types property was set to %s.";
     }
 
     /**

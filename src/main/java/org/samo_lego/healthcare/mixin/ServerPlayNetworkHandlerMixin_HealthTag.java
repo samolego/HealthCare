@@ -11,6 +11,7 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -88,7 +89,13 @@ public class ServerPlayNetworkHandlerMixin_HealthTag {
                 float maxHealth = living.getMaxHealth();
 
                 // @SpaceClouds42 saved me here, `.copy()` after getting custom name is essential!
-                MutableText name = entity.hasCustomName() ? entity.getCustomName().copy() : new TranslatableText(entity.getType().getTranslationKey());
+                MutableText name;
+                if(entity.hasCustomName())
+                    name = entity.getCustomName().copy();
+                else if(((HealthbarPreferences) player).showEntityType())
+                    name = new TranslatableText(entity.getType().getTranslationKey());
+                else
+                    name = (MutableText) LiteralText.EMPTY;
 
                 Text healthbar = ((HealthbarPreferences) this.player).getHealthbarText(health, maxHealth);
                 DataTracker.Entry<Optional<Text>> healthTag = new DataTracker.Entry<>(EntityAccessor.getCUSTOM_NAME(), Optional.of(name.append(" ").append(healthbar)));

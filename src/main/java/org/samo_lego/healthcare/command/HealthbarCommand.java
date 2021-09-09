@@ -40,6 +40,11 @@ public class HealthbarCommand {
                                         .executes(HealthbarCommand::editHealthbarStyle)
                                 )
                         )
+                        .then(literal("showEntityType")
+                                .then(argument("allow entity type", BoolArgumentType.bool())
+                                        .executes(HealthbarCommand::toggleEntityType)
+                                )
+                        )
                         .then(literal("alwaysVisible")
                                 .then(argument("visibility", BoolArgumentType.bool())
                                         .executes(HealthbarCommand::changeVisibility)
@@ -64,6 +69,27 @@ public class HealthbarCommand {
                         )
                 )
         );
+    }
+
+    private static int toggleEntityType(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        if(LUCKPERMS_LOADED && !PermissionHelper.checkPermission(context.getSource(), config.perms.healthbar_edit_showEntityType, 0)) {
+            context.getSource().sendError(new LiteralText(config.lang.noPermission).formatted(Formatting.RED));
+            return -1;
+        }
+
+        HealthbarPreferences preferences = (HealthbarPreferences) context.getSource().getPlayer();
+        boolean allowEntityType = BoolArgumentType.getBool(context, "allow entity type");
+
+        preferences.setShowEntityType(allowEntityType);
+
+        context.getSource().sendFeedback(
+                new LiteralText(String.format(config.lang.toggledType, allowEntityType))
+                        .formatted(Formatting.GREEN)
+                        .append("\n")
+                        .append(new LiteralText(config.lang.reloadRequired).formatted(Formatting.GOLD)),
+                false
+        );
+        return 0;
     }
 
     private static int editHealthbarLength(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
@@ -157,7 +183,7 @@ public class HealthbarCommand {
         preferences.setHealthbarStyle(style);
 
         context.getSource().sendFeedback(
-                new LiteralText(String.format(config.lang.styleSet, style.toString()))
+                new LiteralText(String.format(config.lang.styleSet, style))
                     .formatted(Formatting.GREEN)
                     .append("\n")
                     .append(new LiteralText(config.lang.reloadRequired).formatted(Formatting.GOLD)),

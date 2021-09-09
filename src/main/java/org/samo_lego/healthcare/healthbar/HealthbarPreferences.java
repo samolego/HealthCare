@@ -21,6 +21,13 @@ public interface HealthbarPreferences {
     void setEnabled(boolean enabled);
     boolean isEnabled();
 
+    /**
+     * Sets whether to show entity type next to hearts as well.
+     * @param showEntityType whether to include entity type in name or not.
+     */
+    void setShowEntityType(boolean showEntityType);
+    boolean showEntityType();
+
     void setAlwaysVisible(boolean alwaysVisible);
     boolean isAlwaysVisible();
 

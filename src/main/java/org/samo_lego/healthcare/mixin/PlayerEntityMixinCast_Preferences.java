@@ -18,6 +18,7 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
 
     private Enum<HealthbarStyle> healthbarStyle = config.defaultStyle;
     private boolean enabled = true;
+    private boolean showType = config.showType;
     private boolean alwaysVisible = false;
 
     private int customFullChar = 9632; // '■'
@@ -106,6 +107,16 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
     @Override
     public boolean isEnabled() {
         return this.enabled;
+    }
+
+    @Override
+    public void setShowEntityType(boolean showEntityType) {
+       this.showType = showEntityType;
+    }
+
+    @Override
+    public boolean showEntityType() {
+        return this.showType;
     }
 
     @Override
