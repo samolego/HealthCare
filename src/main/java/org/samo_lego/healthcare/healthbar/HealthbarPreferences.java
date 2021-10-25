@@ -7,8 +7,8 @@ public interface HealthbarPreferences {
      * Gets style of the healthbar.
      * @return healthbar style
      */
-    Enum<HealthbarStyle> getHealthbarStyle();
-    void setHealthbarStyle(Enum<HealthbarStyle> healthbarStyle);
+    HealthbarStyle getHealthbarStyle();
+    void setHealthbarStyle(HealthbarStyle healthbarStyle);
 
     /**
      * Gets the health text from current health and max health depending on HealthbarStyle.

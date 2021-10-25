@@ -12,6 +12,7 @@ import net.minecraft.command.argument.MessageArgumentType;
 import net.minecraft.command.suggestion.SuggestionProviders;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import org.samo_lego.healthcare.healthbar.HealthbarPreferences;
@@ -73,7 +74,7 @@ public class HealthbarCommand {
 
     private static int toggleEntityType(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         if(LUCKPERMS_LOADED && !PermissionHelper.checkPermission(context.getSource(), config.perms.healthbar_edit_showEntityType, 0)) {
-            context.getSource().sendError(new LiteralText(config.lang.noPermission).formatted(Formatting.RED));
+            context.getSource().sendError(new TranslatableText("commands.help.failed").formatted(Formatting.RED));
             return -1;
         }
 
@@ -94,7 +95,7 @@ public class HealthbarCommand {
 
     private static int editHealthbarLength(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         if(LUCKPERMS_LOADED && !PermissionHelper.checkPermission(context.getSource(), config.perms.healthbar_edit_custom_length, 0)) {
-            context.getSource().sendError(new LiteralText(config.lang.noPermission).formatted(Formatting.RED));
+            context.getSource().sendError(new TranslatableText("commands.help.failed").formatted(Formatting.RED));
             return -1;
         }
 
@@ -121,7 +122,7 @@ public class HealthbarCommand {
 
     private static int setSymbol(CommandContext<ServerCommandSource> context, boolean full) throws CommandSyntaxException {
         if(LUCKPERMS_LOADED && !PermissionHelper.checkPermission(context.getSource(), full ? config.perms.healthbar_edit_custom_symbols_full : config.perms.healthbar_edit_custom_symbols_empty, 0)) {
-            context.getSource().sendError(new LiteralText(config.lang.noPermission).formatted(Formatting.RED));
+            context.getSource().sendError(new TranslatableText("commands.help.failed").formatted(Formatting.RED));
             return -1;
         }
 
@@ -152,7 +153,7 @@ public class HealthbarCommand {
 
     private static int changeVisibility(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         if(LUCKPERMS_LOADED && !PermissionHelper.checkPermission(context.getSource(), config.perms.healthbar_edit_visibility, 0)) {
-            context.getSource().sendError(new LiteralText(config.lang.noPermission).formatted(Formatting.RED));
+            context.getSource().sendError(new TranslatableText("commands.help.failed").formatted(Formatting.RED));
             return -1;
         }
 
@@ -173,12 +174,12 @@ public class HealthbarCommand {
 
     private static int editHealthbarStyle(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         if(LUCKPERMS_LOADED && !PermissionHelper.checkPermission(context.getSource(), config.perms.healthbar_edit_style, 0)) {
-            context.getSource().sendError(new LiteralText(config.lang.noPermission).formatted(Formatting.RED));
+            context.getSource().sendError(new TranslatableText("commands.help.failed").formatted(Formatting.RED));
             return -1;
         }
 
         HealthbarPreferences preferences = (HealthbarPreferences) context.getSource().getPlayer();
-        Enum<HealthbarPreferences.HealthbarStyle> style = HealthbarPreferences.HealthbarStyle.valueOf(StringArgumentType.getString(context, "style"));
+        HealthbarPreferences.HealthbarStyle style = HealthbarPreferences.HealthbarStyle.valueOf(StringArgumentType.getString(context, "style"));
 
         preferences.setHealthbarStyle(style);
 
@@ -194,7 +195,7 @@ public class HealthbarCommand {
 
     private static int toggleHealthBar(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         if(LUCKPERMS_LOADED && !PermissionHelper.checkPermission(context.getSource(), config.perms.healthbar_toggle, 0)) {
-            context.getSource().sendError(new LiteralText(config.lang.noPermission).formatted(Formatting.RED));
+            context.getSource().sendError(new TranslatableText("commands.help.failed").formatted(Formatting.RED));
             return -1;
         }
 

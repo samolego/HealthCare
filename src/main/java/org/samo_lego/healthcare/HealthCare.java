@@ -14,6 +14,8 @@ import java.io.File;
 public class HealthCare implements ModInitializer {
 	public static final String MODID = "healthcare";
 
+	public static final File CONFIG_FILE = new File(FabricLoader.getInstance().getConfigDir() + "/health_config.json");
+
 	public static boolean LUCKPERMS_LOADED;
 
 	public static HealthConfig config;
@@ -26,7 +28,7 @@ public class HealthCare implements ModInitializer {
 		EventHandler eventHandler = new EventHandler();
 		ServerPlayerEvents.COPY_FROM.register(eventHandler);
 
-		config = HealthConfig.loadConfigFile(new File(FabricLoader.getInstance().getConfigDir() + "/health_config.json"));
+		config = HealthConfig.loadConfigFile(CONFIG_FILE);
 		LUCKPERMS_LOADED = FabricLoader.getInstance().isModLoaded("fabric-permissions-api-v0");
 	}
 }

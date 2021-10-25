@@ -14,20 +14,15 @@ archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
+def ENV = System.getenv()
+
 repositories {
+	maven { url 'https://jitpack.io'}
+	maven { url "https://maven.architectury.dev/" }
 	maven {
 		url 'https://oss.sonatype.org/content/repositories/snapshots'
 	}
-	maven {
-		url 'https://jitpack.io'
-	}
-	maven {
-		name = "TomTheGeek-repo"
-		url = "https://maven.tomthegeek.ml/releases/"
-	}
 }
-
-def ENV = System.getenv()
 
 dependencies {
 	// To change the versions see the gradle.properties file
@@ -41,10 +36,8 @@ dependencies {
 	// LuckPerms
 	modImplementation 'me.lucko:fabric-permissions-api:0.1-SNAPSHOT'
 
-	// WDMNF
-	modRuntime("com.github.tom_the_geek:wdmnf:1.0.0+mc.1.17")
-	//modRuntime "com.github.CaffeineMC:hydrogen-fabric:mc1.16.5-v0.2.0"
-	//modRuntime "com.github.astei:lazydfu:0.1.2"
+	// Allows in game config editing
+	modImplementation(include("com.github.samolego.Config2Brigadier:config2brigadier-fabric:${project.c2b_version}"))
 }
 
 processResources {

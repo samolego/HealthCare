@@ -50,7 +50,7 @@ public class ServerPlayNetworkHandlerMixin_HealthTag {
 
     /**
      * Gets the current packet being sent and modifies
-     * it accordingly to player's preferences in the packet is
+     * it accordingly to player's preferences if it is
      * an {@link EntityTrackerUpdateS2CPacket}.
      *
      * @param packet packet being sent
@@ -91,14 +91,14 @@ public class ServerPlayNetworkHandlerMixin_HealthTag {
                 // @SpaceClouds42 saved me here, `.copy()` after getting custom name is essential!
                 MutableText name;
                 if(entity.hasCustomName())
-                    name = entity.getCustomName().copy();
+                    name = entity.getCustomName().shallowCopy().append(" ");
                 else if(((HealthbarPreferences) player).showEntityType())
-                    name = new TranslatableText(entity.getType().getTranslationKey());
+                    name = new TranslatableText(entity.getType().getTranslationKey()).append(" ");
                 else
-                    name = (MutableText) LiteralText.EMPTY;
+                    name = new LiteralText("");
 
-                Text healthbar = ((HealthbarPreferences) this.player).getHealthbarText(health, maxHealth);
-                DataTracker.Entry<Optional<Text>> healthTag = new DataTracker.Entry<>(EntityAccessor.getCUSTOM_NAME(), Optional.of(name.append(" ").append(healthbar)));
+                MutableText healthbar = ((HealthbarPreferences) this.player).getHealthbarText(health, maxHealth);
+                DataTracker.Entry<Optional<Text>> healthTag = new DataTracker.Entry<>(EntityAccessor.getCUSTOM_NAME(), Optional.of(name.append(healthbar)));
 
                 Collections.addAll(trackedValues, visibleTag, healthTag);
 

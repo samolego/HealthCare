@@ -3,17 +3,22 @@ package org.samo_lego.healthcare.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
+import org.samo_lego.config2brigadier.IBrigadierConfigurator;
+import org.samo_lego.config2brigadier.annotation.BrigadierDescription;
+import org.samo_lego.config2brigadier.annotation.BrigadierExcluded;
 import org.samo_lego.healthcare.healthbar.HealthbarPreferences;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
+import static org.samo_lego.healthcare.HealthCare.CONFIG_FILE;
 import static org.samo_lego.healthcare.HealthCare.MODID;
 
-public class HealthConfig {
+public class HealthConfig implements IBrigadierConfigurator {
     private static final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .serializeNulls()
@@ -22,32 +27,57 @@ public class HealthConfig {
 
     public final String _comment_blacklistedEntities = "// Which entities shouldn't have a healthbar above their name.";
     @SerializedName("blacklisted_entities")
-    public ArrayList<String> blacklistedEntities = new ArrayList<>(Arrays.asList(
+    @BrigadierDescription(defaultOption = "[\"taterzens:npc\",\"specialmobs:mob_with_hidden_health\"]")
+    public List<String> blacklistedEntities = new ArrayList<>(Arrays.asList(
             "taterzens:npc",
             "specialmobs:mob_with_hidden_health"
     ));
     @SerializedName("// When to activate the healthbar.")
     public String _comment_activationRange = "";
+    @BrigadierDescription(defaultOption = "8.0")
     public float activationRange = 8.0F;
 
+    @BrigadierExcluded
     public final Permissions perms = new Permissions();
 
     @SerializedName("// Max length of healthbar a player can use.")
     public final String _comment_maxHealthbarLength = "";
+    @BrigadierDescription(defaultOption = "20")
     public int maxHealthbarLength = 20;
 
     @SerializedName("// Whether to show entity type next to health.")
     public final String _comment_showType = "";
+    @BrigadierDescription(defaultOption = "true")
     public boolean showType = true;
 
     @SerializedName("// The default style of healthbar. The following are available")
     public final String _comment_defaultStyle1 = Arrays.toString(HealthbarPreferences.HealthbarStyle.values());
+    @BrigadierDescription(defaultOption = "PERCENTAGE")
     public HealthbarPreferences.HealthbarStyle defaultStyle = HealthbarPreferences.HealthbarStyle.PERCENTAGE;
+
+    @SerializedName("// Whether healthbar is enabled by default.")
+    public final String _comment_enabled = "";
+    @BrigadierDescription(defaultOption = "true")
+    @SerializedName("enabled_by_default")
+    public boolean enabledByDefault = true;
+
+    @SerializedName("// Whether healthbar should always be visible (not just on entity hover) by default.")
+    public final String _comment_alwaysVisibleDefault = "";
+    @SerializedName("always_visible_by_default")
+    @BrigadierDescription(defaultOption = "false")
+    public boolean alwaysVisibleDefault = false;
+
+    @Override
+    public void save() {
+       this.saveConfigFile(CONFIG_FILE);
+    }
 
     public static final class Permissions {
         @SerializedName("// Enabled only if LuckPerms is loaded.")
         public final String _comment = "";
-        public final String healthcare_reloadConfig = "healthcare.reloadConfig";
+        public final String healthcare_config = "healthcare.config";
+        public final String healthcare_config_edit = "healthcare.config.edit";
+        public final String healthcare_config_reload = "healthcare.config.reload";
 
         @SerializedName("// Player permissions")
         public final String _comment_playerPermissions = "";
@@ -62,7 +92,6 @@ public class HealthConfig {
 
     public Language lang = new Language();
     public static class Language {
-        public String noPermission = "You don't have permission to run this command.";
         public String configReloaded = "Config was reloaded successfully.";
         public String customLengthSet = "Length of healthbar was set to %s.";
         public String customSymbolSet = "%s healthbar symbol was set to %s.";
@@ -82,7 +111,7 @@ public class HealthConfig {
      * @return HealthConfig object
      */
     public static HealthConfig loadConfigFile(File file) {
-        HealthConfig config;
+        HealthConfig config = null;
         if (file.exists()) {
             try (BufferedReader fileReader = new BufferedReader(
                     new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)
@@ -92,10 +121,10 @@ public class HealthConfig {
                 throw new RuntimeException(MODID + " Problem occurred when trying to load config: ", e);
             }
         }
-        else {
+        if (config == null) {
             config = new HealthConfig();
         }
-        config.saveConfigFile(file);
+        config.save();
 
         return config;
     }
