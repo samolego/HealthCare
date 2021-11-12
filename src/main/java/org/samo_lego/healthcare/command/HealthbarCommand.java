@@ -34,7 +34,7 @@ public class HealthbarCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated) {
         dispatcher.register(literal("healthbar")
                 .then(literal("toggle").executes(HealthbarCommand::toggleHealthBar))
-                .then(literal("edit")
+                .then(literal("preferences")
                         .then(literal("style")
                                 .then(argument("style", word())
                                         .suggests(HEALTHBAR_STYLES)

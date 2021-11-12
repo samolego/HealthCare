@@ -68,7 +68,7 @@ public class ServerPlayNetworkHandlerMixin_HealthTag {
     private void onPacketSend(Packet<?> packet, GenericFutureListener<? extends Future<? super Void>> listener, CallbackInfo ci) {
         if(packet instanceof EntityTrackerUpdateS2CPacket) {
             int id = ((EntityTrackerUpdateS2CPacketAccessor) packet).getId();
-            Entity entity = this.player.getServerWorld().getEntityById(id);
+            Entity entity = this.player.getWorld().getEntityById(id);
 
             if(
                     entity instanceof LivingEntity living &&
