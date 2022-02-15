@@ -74,7 +74,8 @@ public class ServerPlayNetworkHandlerMixin_HealthTag {
                     entity instanceof LivingEntity living &&
                     ((HealthbarPreferences) this.player).isEnabled() &&
                     !(entity instanceof PlayerEntity) &&
-                    !config.blacklistedEntities.contains(Registry.ENTITY_TYPE.getId(entity.getType()).toString())
+                    !config.blacklistedEntities.contains(Registry.ENTITY_TYPE.getId(entity.getType()).toString()) &&
+                    !entity.isInvisibleTo(player)
             ) {
                 List<DataTracker.Entry<?>> trackedValues = new ArrayList<>(((EntityTrackerUpdateS2CPacketAccessor) packet).getTrackedValues());
 
