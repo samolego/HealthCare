@@ -1,6 +1,6 @@
 package org.samo_lego.healthcare.healthbar;
 
-import net.minecraft.text.MutableText;
+import net.minecraft.network.chat.MutableComponent;
 
 public interface HealthbarPreferences {
     /**
@@ -12,11 +12,12 @@ public interface HealthbarPreferences {
 
     /**
      * Gets the health text from current health and max health depending on HealthbarStyle.
-     * @param health current health
+     *
+     * @param health    current health
      * @param maxHealth max health
      * @return formatted mutable text with health info
      */
-    MutableText getHealthbarText(float health, float maxHealth);
+    MutableComponent getHealthbarText(float health, float maxHealth);
 
     void setEnabled(boolean enabled);
     boolean isEnabled();

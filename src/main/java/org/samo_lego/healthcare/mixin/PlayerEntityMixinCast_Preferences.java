@@ -1,10 +1,10 @@
 package org.samo_lego.healthcare.mixin;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.entity.player.Player;
 import org.samo_lego.healthcare.healthbar.HealthbarPreferences;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static org.samo_lego.healthcare.HealthCare.config;
 
-@Mixin(PlayerEntity.class)
+@Mixin(Player.class)
 public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
 
     private HealthbarStyle healthbarStyle = config.defaultStyle;
@@ -36,14 +36,14 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
     }
 
     @Override
-    public MutableText getHealthbarText(float health, float maxHealth) {
-        if(health < 0.0F) {
+    public MutableComponent getHealthbarText(float health, float maxHealth) {
+        if (health < 0.0F) {
             health = 0.0F;
         }
-        if(maxHealth <= 0.0F) {
+        if (maxHealth <= 0.0F) {
             maxHealth = 1.0F;
         }
-        if(health > maxHealth) {
+        if (health > maxHealth) {
             maxHealth = health;
         }
 
@@ -55,14 +55,14 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
                 second = String.valueOf((int) Math.ceil(maxHealth));
 
                 // We return it here because of custom formatting
-                return new LiteralText(first)
-                        .formatted(health > maxHealth / 2 ? Formatting.GREEN : Formatting.YELLOW)
-                        .append(new LiteralText("/")
-                                .formatted(Formatting.WHITE))
-                        .append(new LiteralText(second)
-                                .formatted(Formatting.GREEN))
-                        .append(new LiteralText(String.valueOf((char) 10084)) // ❤
-                                .formatted(Formatting.RED));
+                return Component.literal(first)
+                        .withStyle(health > maxHealth / 2 ? ChatFormatting.GREEN : ChatFormatting.YELLOW)
+                        .append(Component.literal("/")
+                                .withStyle(ChatFormatting.WHITE))
+                        .append(Component.literal(second)
+                                .withStyle(ChatFormatting.GREEN))
+                        .append(Component.literal(String.valueOf((char) 10084)) // ❤
+                                .withStyle(ChatFormatting.RED));
             }
             case NUMBER -> {
                 // Number
@@ -98,9 +98,9 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
                 second = new String(new char[heartCount - fullHearts]).replace('\0', empty);
             }
         }
-        return new LiteralText(first)
-                .formatted(Formatting.RED) /*health > maxHealth / 3 ? (health > maxHealth * 1.5F ? Formatting.YELLOW : Formatting.GOLD) : */
-                .append(new LiteralText(second).formatted(Formatting.GRAY));
+        return Component.literal(first)
+                .withStyle(ChatFormatting.RED) /*health > maxHealth / 3 ? (health > maxHealth * 1.5F ? Formatting.YELLOW : Formatting.GOLD) : */
+                .append(Component.literal(second).withStyle(ChatFormatting.GRAY));
     }
 
     @Override
@@ -155,7 +155,7 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
 
     @Override
     public void setCustomLength(int length) {
-        if(length >= 0) // Don't allow negative length
+        if (length >= 0) // Don't allow negative length
             this.customLength = length;
     }
 
@@ -164,14 +164,14 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
         return this.customLength;
     }
 
-    @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
-    private void writeCustomDataToTag(NbtCompound tag, CallbackInfo ci) {
-        NbtCompound healthbar = new NbtCompound();
+    @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
+    private void writeCustomDataToTag(CompoundTag tag, CallbackInfo ci) {
+        CompoundTag healthbar = new CompoundTag();
         healthbar.putString("Style", this.healthbarStyle.toString());
         healthbar.putBoolean("Enabled", this.enabled);
         healthbar.putBoolean("ShowType", this.showType);
         healthbar.putBoolean("AlwaysVisible", this.alwaysVisible);
-        if(this.healthbarStyle.equals(HealthbarStyle.CUSTOM)) {
+        if (this.healthbarStyle.equals(HealthbarStyle.CUSTOM)) {
             healthbar.putInt("CustomFullChar", this.customFullChar);
             healthbar.putInt("CustomEmptyChar", this.customEmptyChar);
             healthbar.putInt("Length", this.customLength);
@@ -179,16 +179,16 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
         tag.put("Healthbar", healthbar);
     }
 
-    @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
-    private void readCustomDataFromTag(NbtCompound tag, CallbackInfo ci) {
-        if(tag.contains("Healthbar")) {
-            NbtCompound healthbar = tag.getCompound("Healthbar");
+    @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
+    private void readCustomDataFromTag(CompoundTag tag, CallbackInfo ci) {
+        if (tag.contains("Healthbar")) {
+            CompoundTag healthbar = tag.getCompound("Healthbar");
             this.healthbarStyle = HealthbarStyle.valueOf(healthbar.getString("Style"));
             this.enabled = healthbar.getBoolean("Enabled");
             this.alwaysVisible = healthbar.getBoolean("AlwaysVisible");
             this.showType = healthbar.getBoolean("ShowType");
 
-            if(this.healthbarStyle.equals(HealthbarStyle.CUSTOM)) {
+            if (this.healthbarStyle.equals(HealthbarStyle.CUSTOM)) {
                 this.customFullChar = healthbar.getInt("CustomFullChar");
                 this.customEmptyChar = healthbar.getInt("CustomEmptyChar");
                 this.customLength = healthbar.getInt("Length");

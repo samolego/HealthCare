@@ -1,7 +1,7 @@
 package org.samo_lego.healthcare.event;
 
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 import org.samo_lego.healthcare.healthbar.HealthbarPreferences;
 
 public class EventHandler implements ServerPlayerEvents.CopyFrom {
@@ -14,7 +14,7 @@ public class EventHandler implements ServerPlayerEvents.CopyFrom {
      * @param alive     whether the old player is still alive
      */
     @Override
-    public void copyFromPlayer(ServerPlayerEntity oldPlayer, ServerPlayerEntity newPlayer, boolean alive) {
+    public void copyFromPlayer(ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean alive) {
         ((HealthbarPreferences) newPlayer).setHealthbarStyle(((HealthbarPreferences) oldPlayer).getHealthbarStyle());
         ((HealthbarPreferences) newPlayer).setEnabled(((HealthbarPreferences) oldPlayer).isEnabled());
         ((HealthbarPreferences) newPlayer).setAlwaysVisible(((HealthbarPreferences) oldPlayer).isAlwaysVisible());

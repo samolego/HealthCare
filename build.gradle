@@ -1,7 +1,7 @@
 import com.modrinth.minotaur.TaskModrinthUpload
 
 plugins {
-	id 'fabric-loom' version '0.10-SNAPSHOT'
+	id 'fabric-loom' version '0.12-SNAPSHOT'
 	id 'maven-publish'
 	id "com.matthewprenger.cursegradle" version "1.4.0"
 	id "com.modrinth.minotaur" version "1.1.0"
@@ -27,7 +27,7 @@ repositories {
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	mappings loom.officialMojangMappings()
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
@@ -108,6 +108,7 @@ curseforge {
 		releaseType = "release"
 		addGameVersion "${project.minecraft_version}"
 		addGameVersion "Fabric"
+		addGameVersion "Quilt"
 
 		mainArtifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")) {
 			displayName = "[${project.minecraft_version}] Healthcare ${version}"
@@ -138,4 +139,5 @@ task modrinth(type: TaskModrinthUpload, dependsOn: remapJar) {
 
 	addGameVersion("${project.minecraft_version}")
 	addLoader('fabric')
+	addLoader('quilt')
 }
