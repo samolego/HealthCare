@@ -3,34 +3,33 @@ package org.samo_lego.healthcare.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import org.samo_lego.healthcare.config.HealthConfig;
-import org.samo_lego.healthcare.permission.PermissionHelper;
 
 import static net.minecraft.commands.Commands.literal;
 import static org.samo_lego.healthcare.HealthCare.CONFIG_FILE;
-import static org.samo_lego.healthcare.HealthCare.LUCKPERMS_LOADED;
 import static org.samo_lego.healthcare.HealthCare.config;
 
 public class HealthcareCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context, Commands.CommandSelection selection) {
         LiteralCommandNode<CommandSourceStack> healthcareNode = dispatcher.register(literal("healthcare")
-                .requires(src -> LUCKPERMS_LOADED ? PermissionHelper.checkPermission(src, config.perms.healthcare_config, 4) : src.hasPermission(4)));
+                .requires(src -> Permissions.check(src, "healthcare.config", 4)));
 
         LiteralCommandNode<CommandSourceStack> configNode = literal("config")
                 .then(literal("reload")
-                        .requires(src -> LUCKPERMS_LOADED ? PermissionHelper.checkPermission(src, config.perms.healthcare_config_reload, 4) : src.hasPermission(4))
+                        .requires(src -> Permissions.check(src, "healthcare.config.reload", 4))
                         .executes(HealthcareCommand::reloadConfig)
                 )
                 .build();
 
         LiteralCommandNode<CommandSourceStack> editNode = literal("edit")
-                .requires(src -> LUCKPERMS_LOADED ? PermissionHelper.checkPermission(src, config.perms.healthcare_config_edit, 4) : src.hasPermission(4))
+                .requires(src -> Permissions.check(src, "healthcare.config.edit", 4))
                 .build();
 
         config.generateCommand(editNode);
@@ -47,6 +46,6 @@ public class HealthcareCommand {
                 Component.literal(config.lang.configReloaded).withStyle(ChatFormatting.GREEN),
                 false
         );
-        return 0;
+        return 1;
     }
 }

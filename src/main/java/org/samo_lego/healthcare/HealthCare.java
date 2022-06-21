@@ -16,7 +16,7 @@ public class HealthCare implements ModInitializer {
 
 	public static final File CONFIG_FILE = new File(FabricLoader.getInstance().getConfigDir() + "/health_config.json");
 
-	public static boolean LUCKPERMS_LOADED;
+	public static boolean LUCKPERMS_LOADED = true;
 
 	public static HealthConfig config;
 
@@ -25,10 +25,9 @@ public class HealthCare implements ModInitializer {
 		CommandRegistrationCallback.EVENT.register(HealthbarCommand::register);
 		CommandRegistrationCallback.EVENT.register(HealthcareCommand::register);
 
-		EventHandler eventHandler = new EventHandler();
-		ServerPlayerEvents.COPY_FROM.register(eventHandler);
+		ServerPlayerEvents.COPY_FROM.register(new EventHandler());
 
 		config = HealthConfig.loadConfigFile(CONFIG_FILE);
-		LUCKPERMS_LOADED = FabricLoader.getInstance().isModLoaded("fabric-permissions-api-v0");
+		//LUCKPERMS_LOADED = FabricLoader.getInstance().isModLoaded("fabric-permissions-api-v0");
 	}
 }

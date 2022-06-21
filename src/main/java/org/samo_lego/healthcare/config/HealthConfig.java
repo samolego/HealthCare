@@ -5,10 +5,16 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 import org.samo_lego.config2brigadier.IBrigadierConfigurator;
 import org.samo_lego.config2brigadier.annotation.BrigadierDescription;
-import org.samo_lego.config2brigadier.annotation.BrigadierExcluded;
 import org.samo_lego.healthcare.healthbar.HealthbarPreferences;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,9 +42,6 @@ public class HealthConfig implements IBrigadierConfigurator {
     public String _comment_activationRange = "";
     @BrigadierDescription(defaultOption = "8.0")
     public float activationRange = 8.0F;
-
-    @BrigadierExcluded
-    public final Permissions perms = new Permissions();
 
     @SerializedName("// Max length of healthbar a player can use.")
     public final String _comment_maxHealthbarLength = "";
@@ -70,24 +73,6 @@ public class HealthConfig implements IBrigadierConfigurator {
     @Override
     public void save() {
        this.saveConfigFile(CONFIG_FILE);
-    }
-
-    public static final class Permissions {
-        @SerializedName("// Enabled only if LuckPerms is loaded.")
-        public final String _comment = "";
-        public final String healthcare_config = "healthcare.config";
-        public final String healthcare_config_edit = "healthcare.config.edit";
-        public final String healthcare_config_reload = "healthcare.config.reload";
-
-        @SerializedName("// Player permissions")
-        public final String _comment_playerPermissions = "";
-        public final String healthbar_toggle = "healthcare.healthbar.toggle";
-        public final String healthbar_edit_style = "healthcare.healthbar.edit.style";
-        public final String healthbar_edit_showEntityType = "healthcare.healthbar.edit.show_entity_type";
-        public final String healthbar_edit_visibility = "healthcare.healthbar.edit.visibility";
-        public final String healthbar_edit_custom_length = "healthcare.healthbar.edit.custom.length";
-        public final String healthbar_edit_custom_symbols_full = "healthcare.healthbar.edit.symbol.full";
-        public final String healthbar_edit_custom_symbols_empty = "healthcare.healthbar.edit.symbol.empty";
     }
 
     public Language lang = new Language();

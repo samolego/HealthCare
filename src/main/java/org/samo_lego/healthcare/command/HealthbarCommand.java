@@ -7,6 +7,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -17,7 +18,6 @@ import net.minecraft.commands.synchronization.SuggestionProviders;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.samo_lego.healthcare.healthbar.HealthbarPreferences;
-import org.samo_lego.healthcare.permission.PermissionHelper;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -27,7 +27,6 @@ import static com.mojang.brigadier.arguments.StringArgumentType.word;
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
 import static net.minecraft.commands.arguments.MessageArgument.message;
-import static org.samo_lego.healthcare.HealthCare.LUCKPERMS_LOADED;
 import static org.samo_lego.healthcare.HealthCare.MODID;
 import static org.samo_lego.healthcare.HealthCare.config;
 
@@ -36,36 +35,47 @@ public class HealthbarCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context, Commands.CommandSelection selection) {
         dispatcher.register(literal("healthbar")
-                .then(literal("toggle").executes(HealthbarCommand::toggleHealthBar))
-                .then(literal("preferences")
+                .requires(src -> Permissions.check(src, "healthcare.healthbar", true))
+                .then(literal("toggle")
+                        .requires(src -> Permissions.check(src, "healthcare.healthbar.toggle", true))
+                        .executes(HealthbarCommand::toggleHealthBar))
+                .then(literal("edit")
+                        .requires(src -> Permissions.check(src, "healthcare.healthbar.edit", true))
                         .then(literal("style")
+                                .requires(src -> Permissions.check(src, "healthcare.healthbar.edit.style", true))
                                 .then(argument("style", word())
                                         .suggests(HEALTHBAR_STYLES)
                                         .executes(HealthbarCommand::editHealthbarStyle)
                                 )
                         )
                         .then(literal("showEntityType")
+                                .requires(src -> Permissions.check(src, "healthcare.healthbar.edit.show_entity_type", true))
                                 .then(argument("allow entity type", BoolArgumentType.bool())
                                         .executes(HealthbarCommand::toggleEntityType)
                                 )
                         )
                         .then(literal("alwaysVisible")
+                                .requires(src -> Permissions.check(src, "healthcare.healthbar.edit.visibility", true))
                                 .then(argument("visibility", BoolArgumentType.bool())
                                         .executes(HealthbarCommand::changeVisibility)
                                 )
                         )
                         .then(literal("custom")
+                                .requires(src -> Permissions.check(src, "healthcare.healthbar.edit.custom", true))
                             .then(literal("healthbarLength")
+                                    .requires(src -> Permissions.check(src, "healthcare.healthbar.edit.custom.length", true))
                                 .then(argument("length", integer(1, config.maxHealthbarLength))
                                     .executes(HealthbarCommand::editHealthbarLength)
                                 )
                             )
                             .then(literal("fullSymbol")
+                                    .requires(src -> Permissions.check(src, "healthcare.healthbar.edit.custom.symbol", true))
                                     .then(argument("symbol", message())
                                             .executes(ctx -> setSymbol(ctx, true))
                                     )
                             )
                             .then(literal("emptySymbol")
+                                    .requires(src -> Permissions.check(src, "healthcare.healthbar.edit.custom.symbol", true))
                                     .then(argument("symbol", message())
                                             .executes(ctx -> setSymbol(ctx, false))
                                     )
@@ -76,11 +86,6 @@ public class HealthbarCommand {
     }
 
     private static int toggleEntityType(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        if (LUCKPERMS_LOADED && !PermissionHelper.checkPermission(context.getSource(), config.perms.healthbar_edit_showEntityType, 0)) {
-            context.getSource().sendFailure(Component.translatable("commands.help.failed").withStyle(ChatFormatting.RED));
-            return -1;
-        }
-
         HealthbarPreferences preferences = (HealthbarPreferences) context.getSource().getPlayerOrException();
         boolean allowEntityType = BoolArgumentType.getBool(context, "allow entity type");
 
@@ -93,15 +98,10 @@ public class HealthbarCommand {
                         .append(Component.literal(config.lang.reloadRequired).withStyle(ChatFormatting.GOLD)),
                 false
         );
-        return 0;
+        return 1;
     }
 
     private static int editHealthbarLength(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        if (LUCKPERMS_LOADED && !PermissionHelper.checkPermission(context.getSource(), config.perms.healthbar_edit_custom_length, 0)) {
-            context.getSource().sendFailure(Component.translatable("commands.help.failed").withStyle(ChatFormatting.RED));
-            return -1;
-        }
-
         HealthbarPreferences preferences = (HealthbarPreferences) context.getSource().getPlayerOrException();
         int length = IntegerArgumentType.getInteger(context, "length");
         preferences.setCustomLength(length);
@@ -120,15 +120,10 @@ public class HealthbarCommand {
             );
         }
 
-        return 0;
+        return 1;
     }
 
     private static int setSymbol(CommandContext<CommandSourceStack> context, boolean full) throws CommandSyntaxException {
-        if (LUCKPERMS_LOADED && !PermissionHelper.checkPermission(context.getSource(), full ? config.perms.healthbar_edit_custom_symbols_full : config.perms.healthbar_edit_custom_symbols_empty, 0)) {
-            context.getSource().sendFailure(Component.translatable("commands.help.failed").withStyle(ChatFormatting.RED));
-            return -1;
-        }
-
         HealthbarPreferences preferences = (HealthbarPreferences) context.getSource().getPlayerOrException();
         char symbol = MessageArgument.getMessage(context, "symbol").getString().toCharArray()[0];
 
@@ -151,15 +146,10 @@ public class HealthbarCommand {
             );
         }
 
-        return 0;
+        return 1;
     }
 
     private static int changeVisibility(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        if (LUCKPERMS_LOADED && !PermissionHelper.checkPermission(context.getSource(), config.perms.healthbar_edit_visibility, 0)) {
-            context.getSource().sendFailure(Component.translatable("commands.help.failed").withStyle(ChatFormatting.RED));
-            return -1;
-        }
-
         HealthbarPreferences preferences = (HealthbarPreferences) context.getSource().getPlayerOrException();
         boolean alwaysVisible = BoolArgumentType.getBool(context, "visibility");
 
@@ -172,17 +162,12 @@ public class HealthbarCommand {
                         .append(Component.literal(config.lang.reloadRequired).withStyle(ChatFormatting.GOLD)),
                 false
         );
-        return 0;
+        return 1;
     }
 
     private static int editHealthbarStyle(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        if (LUCKPERMS_LOADED && !PermissionHelper.checkPermission(context.getSource(), config.perms.healthbar_edit_style, 0)) {
-            context.getSource().sendFailure(Component.translatable("commands.help.failed").withStyle(ChatFormatting.RED));
-            return -1;
-        }
-
         HealthbarPreferences preferences = (HealthbarPreferences) context.getSource().getPlayerOrException();
-        HealthbarPreferences.HealthbarStyle style = HealthbarPreferences.HealthbarStyle.valueOf(StringArgumentType.getString(context, "style"));
+        var style = HealthbarPreferences.HealthbarStyle.valueOf(StringArgumentType.getString(context, "style"));
 
         preferences.setHealthbarStyle(style);
 
@@ -193,15 +178,10 @@ public class HealthbarCommand {
                         .append(Component.literal(config.lang.reloadRequired).withStyle(ChatFormatting.GOLD)),
                 false
         );
-        return 0;
+        return 1;
     }
 
     private static int toggleHealthBar(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        if (LUCKPERMS_LOADED && !PermissionHelper.checkPermission(context.getSource(), config.perms.healthbar_toggle, 0)) {
-            context.getSource().sendFailure(Component.translatable("commands.help.failed").withStyle(ChatFormatting.RED));
-            return -1;
-        }
-
         HealthbarPreferences preferences = (HealthbarPreferences) context.getSource().getPlayerOrException();
         preferences.setEnabled(!preferences.isEnabled());
 
@@ -213,7 +193,7 @@ public class HealthbarCommand {
                 false
         );
 
-        return 0;
+        return 1;
     }
 
     static {
