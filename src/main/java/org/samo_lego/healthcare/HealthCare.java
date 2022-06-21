@@ -7,7 +7,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import org.samo_lego.healthcare.command.HealthbarCommand;
 import org.samo_lego.healthcare.command.HealthcareCommand;
 import org.samo_lego.healthcare.config.HealthConfig;
-import org.samo_lego.healthcare.event.EventHandler;
+import org.samo_lego.healthcare.event.PlayerDataEvent;
 
 import java.io.File;
 
@@ -25,7 +25,7 @@ public class HealthCare implements ModInitializer {
 		CommandRegistrationCallback.EVENT.register(HealthbarCommand::register);
 		CommandRegistrationCallback.EVENT.register(HealthcareCommand::register);
 
-		ServerPlayerEvents.COPY_FROM.register(new EventHandler());
+        ServerPlayerEvents.COPY_FROM.register(new PlayerDataEvent());
 
 		config = HealthConfig.loadConfigFile(CONFIG_FILE);
 		//LUCKPERMS_LOADED = FabricLoader.getInstance().isModLoaded("fabric-permissions-api-v0");

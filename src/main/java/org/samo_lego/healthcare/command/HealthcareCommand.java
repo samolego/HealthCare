@@ -43,7 +43,7 @@ public class HealthcareCommand {
         config.reload(newConfig);
 
         ctx.getSource().sendSuccess(
-                Component.literal(config.lang.configReloaded).withStyle(ChatFormatting.GREEN),
+                Component.translatable("healthcare.config_reload_success").withStyle(ChatFormatting.GREEN),
                 false
         );
         return 1;

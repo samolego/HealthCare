@@ -19,6 +19,7 @@ def ENV = System.getenv()
 repositories {
 	maven { url 'https://jitpack.io'}
 	maven { url "https://maven.architectury.dev/" }
+	maven { url 'https://maven.nucleoid.xyz' }
 	maven {
 		url 'https://oss.sonatype.org/content/repositories/snapshots'
 	}
@@ -35,6 +36,8 @@ dependencies {
 
 	// LuckPerms
 	modImplementation(include('me.lucko:fabric-permissions-api:0.1-SNAPSHOT'))
+
+	modImplementation(include("fr.catcore:server-translations-api:${project.translations_version}"))
 
 	// Allows in game config editing
 	modImplementation(include("com.github.samolego.Config2Brigadier:config2brigadier-fabric:${project.c2b_version}"))

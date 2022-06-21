@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 import org.samo_lego.config2brigadier.IBrigadierConfigurator;
 import org.samo_lego.config2brigadier.annotation.BrigadierDescription;
-import org.samo_lego.healthcare.healthbar.HealthbarPreferences;
+import org.samo_lego.healthcare.healthbar.HealthbarStyle;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,7 +16,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,10 +33,10 @@ public class HealthConfig implements IBrigadierConfigurator {
     public final String _comment_blacklistedEntities = "// Which entities shouldn't have a healthbar above their name.";
     @SerializedName("blacklisted_entities")
     @BrigadierDescription(defaultOption = "[\"taterzens:npc\",\"specialmobs:mob_with_hidden_health\"]")
-    public List<String> blacklistedEntities = new ArrayList<>(Arrays.asList(
+    public List<String> blacklistedEntities = Arrays.asList(
             "taterzens:npc",
             "specialmobs:mob_with_hidden_health"
-    ));
+    );
     @SerializedName("// When to activate the healthbar.")
     public String _comment_activationRange = "";
     @BrigadierDescription(defaultOption = "8.0")
@@ -54,9 +53,9 @@ public class HealthConfig implements IBrigadierConfigurator {
     public boolean showType = true;
 
     @SerializedName("// The default style of healthbar. The following are available")
-    public final String _comment_defaultStyle1 = Arrays.toString(HealthbarPreferences.HealthbarStyle.values());
+    public final String _comment_defaultStyle1 = Arrays.toString(HealthbarStyle.values());
     @BrigadierDescription(defaultOption = "PERCENTAGE")
-    public HealthbarPreferences.HealthbarStyle defaultStyle = HealthbarPreferences.HealthbarStyle.PERCENTAGE;
+    public HealthbarStyle defaultStyle = HealthbarStyle.PERCENTAGE;
 
     @SerializedName("// Whether healthbar is enabled by default.")
     public final String _comment_enabled = "";
@@ -73,20 +72,6 @@ public class HealthConfig implements IBrigadierConfigurator {
     @Override
     public void save() {
        this.saveConfigFile(CONFIG_FILE);
-    }
-
-    public Language lang = new Language();
-    public static class Language {
-        public String configReloaded = "Config was reloaded successfully.";
-        public String customLengthSet = "Length of healthbar was set to %s.";
-        public String customSymbolSet = "%s healthbar symbol was set to %s.";
-        public String visibilitySet = "Always-visible property of healthbar was set to: %s";
-        public String styleSet = "Style of your healthbar has been set to %s.";
-        public String useCustomStyle = "Make sure to use style CUSTOM to have your settings applied.";
-        public String healthbarEnabled = "Healthbars are now enabled.";
-        public String healthbarDisabled = "Healthbars are now disabled.";
-        public String reloadRequired = "Changes will be visible after relogging or entity update(s).";
-        public String toggledType = "Show-entity-types property was set to %s.";
     }
 
     /**

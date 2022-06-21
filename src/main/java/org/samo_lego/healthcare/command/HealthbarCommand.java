@@ -18,6 +18,7 @@ import net.minecraft.commands.synchronization.SuggestionProviders;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.samo_lego.healthcare.healthbar.HealthbarPreferences;
+import org.samo_lego.healthcare.healthbar.HealthbarStyle;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -89,13 +90,13 @@ public class HealthbarCommand {
         HealthbarPreferences preferences = (HealthbarPreferences) context.getSource().getPlayerOrException();
         boolean allowEntityType = BoolArgumentType.getBool(context, "allow entity type");
 
-        preferences.setShowEntityType(allowEntityType);
+        preferences.healthcarePrefs().showType = allowEntityType;
 
         context.getSource().sendSuccess(
-                Component.literal(String.format(config.lang.toggledType, allowEntityType))
+                Component.translatable("healthcare.healthbar.toggledType", allowEntityType)
                         .withStyle(ChatFormatting.GREEN)
                         .append("\n")
-                        .append(Component.literal(config.lang.reloadRequired).withStyle(ChatFormatting.GOLD)),
+                        .append(Component.translatable("healthcare.healthbar.reloadRequired").withStyle(ChatFormatting.GOLD)),
                 false
         );
         return 1;
@@ -104,18 +105,18 @@ public class HealthbarCommand {
     private static int editHealthbarLength(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         HealthbarPreferences preferences = (HealthbarPreferences) context.getSource().getPlayerOrException();
         int length = IntegerArgumentType.getInteger(context, "length");
-        preferences.setCustomLength(length);
+        preferences.healthcarePrefs().customLength = length;
 
         context.getSource().sendSuccess(
-                Component.literal(String.format(config.lang.customLengthSet, length))
+                Component.translatable("healthcare.healthbar.customLengthSet", length)
                         .withStyle(ChatFormatting.GREEN)
                         .append("\n")
-                        .append(Component.literal(config.lang.reloadRequired).withStyle(ChatFormatting.GOLD)),
+                        .append(Component.translatable("healthcare.healthbar.reloadRequired").withStyle(ChatFormatting.GOLD)),
                 false
         );
-        if (!preferences.getHealthbarStyle().equals(HealthbarPreferences.HealthbarStyle.CUSTOM)) {
+        if (preferences.healthcarePrefs().healthbarStyle != HealthbarStyle.CUSTOM) {
             context.getSource().sendSuccess(
-                    Component.literal(config.lang.useCustomStyle).withStyle(ChatFormatting.GOLD),
+                    Component.translatable("healthcare.healthbar.useCustomStyle").withStyle(ChatFormatting.GOLD),
                     false
             );
         }
@@ -127,21 +128,22 @@ public class HealthbarCommand {
         HealthbarPreferences preferences = (HealthbarPreferences) context.getSource().getPlayerOrException();
         char symbol = MessageArgument.getMessage(context, "symbol").getString().toCharArray()[0];
 
-        if (full)
-            preferences.setCustomFullChar(symbol);
-        else
-            preferences.setCustomEmptyChar(symbol);
+        if (full) {
+            preferences.healthcarePrefs().customFullChar = symbol;
+        } else {
+            preferences.healthcarePrefs().customEmptyChar = symbol;
+        }
 
         context.getSource().sendSuccess(
-                Component.literal(String.format(config.lang.customSymbolSet, full ? "Full" : "Empty", symbol))
+                Component.translatable("healthcare.healthbar.customSymbolSet", full ? "Full" : "Empty", symbol)
                         .withStyle(ChatFormatting.GREEN)
                         .append("\n")
-                        .append(Component.literal(config.lang.reloadRequired).withStyle(ChatFormatting.GOLD)),
+                        .append(Component.translatable("healthcare.healthbar.reloadRequired").withStyle(ChatFormatting.GOLD)),
                 false
         );
-        if (!preferences.getHealthbarStyle().equals(HealthbarPreferences.HealthbarStyle.CUSTOM)) {
+        if (preferences.healthcarePrefs().healthbarStyle != HealthbarStyle.CUSTOM) {
             context.getSource().sendSuccess(
-                    Component.literal(config.lang.useCustomStyle).withStyle(ChatFormatting.GOLD),
+                    Component.translatable("healthcare.healthbar.useCustomStyle").withStyle(ChatFormatting.GOLD),
                     false
             );
         }
@@ -153,13 +155,13 @@ public class HealthbarCommand {
         HealthbarPreferences preferences = (HealthbarPreferences) context.getSource().getPlayerOrException();
         boolean alwaysVisible = BoolArgumentType.getBool(context, "visibility");
 
-        preferences.setAlwaysVisible(alwaysVisible);
+        preferences.healthcarePrefs().alwaysVisible = alwaysVisible;
 
         context.getSource().sendSuccess(
-                Component.literal(String.format(config.lang.visibilitySet, alwaysVisible))
+                Component.translatable("healthcare.healthbar.visibilitySet", alwaysVisible)
                         .withStyle(ChatFormatting.GREEN)
                         .append("\n")
-                        .append(Component.literal(config.lang.reloadRequired).withStyle(ChatFormatting.GOLD)),
+                        .append(Component.translatable("healthcare.healthbar.reloadRequired").withStyle(ChatFormatting.GOLD)),
                 false
         );
         return 1;
@@ -167,15 +169,15 @@ public class HealthbarCommand {
 
     private static int editHealthbarStyle(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         HealthbarPreferences preferences = (HealthbarPreferences) context.getSource().getPlayerOrException();
-        var style = HealthbarPreferences.HealthbarStyle.valueOf(StringArgumentType.getString(context, "style"));
+        var style = HealthbarStyle.valueOf(StringArgumentType.getString(context, "style"));
 
-        preferences.setHealthbarStyle(style);
+        preferences.healthcarePrefs().healthbarStyle = style;
 
         context.getSource().sendSuccess(
-                Component.literal(String.format(config.lang.styleSet, style))
+                Component.translatable("healthcare.healthbar.styleSet", style)
                         .withStyle(ChatFormatting.GREEN)
                         .append("\n")
-                        .append(Component.literal(config.lang.reloadRequired).withStyle(ChatFormatting.GOLD)),
+                        .append(Component.translatable("healthcare.healthbar.reloadRequired").withStyle(ChatFormatting.GOLD)),
                 false
         );
         return 1;
@@ -183,13 +185,14 @@ public class HealthbarCommand {
 
     private static int toggleHealthBar(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         HealthbarPreferences preferences = (HealthbarPreferences) context.getSource().getPlayerOrException();
-        preferences.setEnabled(!preferences.isEnabled());
+        boolean enabled = !preferences.healthcarePrefs().enabled;
+        preferences.healthcarePrefs().enabled = enabled;
 
         context.getSource().sendSuccess(
-                Component.literal(preferences.isEnabled() ? config.lang.healthbarEnabled : config.lang.healthbarDisabled)
+                Component.translatable(enabled ? "healthcare.healthbar.healthbarEnabled" : "healthcare.healthbar.healthbarDisabled")
                         .withStyle(ChatFormatting.GREEN)
                         .append("\n")
-                        .append(Component.literal(config.lang.reloadRequired).withStyle(ChatFormatting.GOLD)),
+                        .append(Component.translatable("healthcare.healthbar.reloadRequired").withStyle(ChatFormatting.GOLD)),
                 false
         );
 
@@ -200,7 +203,7 @@ public class HealthbarCommand {
         HEALTHBAR_STYLES = SuggestionProviders.register(
                 new ResourceLocation(MODID, "healthbar_styles"),
                 (context, builder) ->
-                        SharedSuggestionProvider.suggest(Stream.of(HealthbarPreferences.HealthbarStyle.values()).map(Enum::name).collect(Collectors.toList()), builder)
+                        SharedSuggestionProvider.suggest(Stream.of(HealthbarStyle.values()).map(Enum::name).collect(Collectors.toList()), builder)
         );
     }
 }

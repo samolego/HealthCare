@@ -1,0 +1,12 @@
+{
+  "healthcare.config_reload_success": "Config was reloaded successfully.",
+  "healthcare.healthbar.customLengthSet": "Length of healthbar was set to %s.",
+  "healthcare.healthbar.customSymbolSet": "%s healthbar symbol was set to %s.",
+  "healthcare.healthbar.visibilitySet": "Always-visible property of healthbar was set to: %s",
+  "healthcare.healthbar.styleSet": "Style of your healthbar has been set to %s.",
+  "healthcare.healthbar.useCustomStyle": "Make sure to use style CUSTOM to have your settings applied.",
+  "healthcare.healthbar.healthbarEnabled": "Healthbars are now enabled.",
+  "healthcare.healthbar.healthbarDisabled": "Healthbars are now disabled.",
+  "healthcare.healthbar.reloadRequired": "Changes will be visible after relogging or entity update(s).",
+  "healthcare.healthbar.toggledType": "Show-entity-types property was set to %s."
+}
