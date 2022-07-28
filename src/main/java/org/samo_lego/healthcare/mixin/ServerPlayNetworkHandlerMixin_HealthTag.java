@@ -1,9 +1,7 @@
 package org.samo_lego.healthcare.mixin;
 
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
 import net.minecraft.core.Registry;
-import net.minecraft.network.Connection;
+import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.Packet;
@@ -16,7 +14,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 import org.samo_lego.healthcare.healthbar.HealthbarPreferences;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -36,14 +33,10 @@ public abstract class ServerPlayNetworkHandlerMixin_HealthTag {
     public ServerPlayer player;
 
     @Shadow
-    @Final
-    public Connection connection;
+    public abstract void send(Packet<?> packet, @Nullable PacketSendListener packetSendListener);
 
     @Unique
     private boolean hc_skipCheck;
-
-    @Shadow
-    public abstract void send(Packet<?> packet, @Nullable GenericFutureListener<? extends Future<? super Void>> genericFutureListener);
 
     /**
      * Dummy handler used for creating modified
@@ -65,14 +58,14 @@ public abstract class ServerPlayNetworkHandlerMixin_HealthTag {
      * @param ci
      */
     @Inject(
-            method = "send(Lnet/minecraft/network/protocol/Packet;Lio/netty/util/concurrent/GenericFutureListener;)V",
+            method = "send(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketSendListener;)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/network/Connection;send(Lnet/minecraft/network/protocol/Packet;Lio/netty/util/concurrent/GenericFutureListener;)V"
+                    target = "Lnet/minecraft/network/Connection;send(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketSendListener;)V"
             ),
             cancellable = true
     )
-    private void onPacketSend(Packet<?> packet, GenericFutureListener<? extends Future<? super Void>> listener, CallbackInfo ci) {
+    private void onPacketSend(Packet<?> packet, PacketSendListener listener, CallbackInfo ci) {
         if (packet instanceof ClientboundSetEntityDataPacket && !this.hc_skipCheck) {
             int id = ((EntityTrackerUpdateS2CPacketAccessor) packet).getId();
             Entity entity = this.player.getLevel().getEntity(id);
