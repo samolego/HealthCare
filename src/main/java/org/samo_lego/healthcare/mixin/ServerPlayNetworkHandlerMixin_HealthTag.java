@@ -1,6 +1,6 @@
 package org.samo_lego.healthcare.mixin;
 
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -65,33 +65,33 @@ public abstract class ServerPlayNetworkHandlerMixin_HealthTag {
             ),
             cancellable = true
     )
-    private void onPacketSend(Packet<?> packet, PacketSendListener listener, CallbackInfo ci) {
-        if (packet instanceof ClientboundSetEntityDataPacket && !this.hc_skipCheck) {
-            int id = ((EntityTrackerUpdateS2CPacketAccessor) packet).getId();
+    private void onPacketSend(Packet<?> sendPacket, PacketSendListener listener, CallbackInfo ci) {
+        if (sendPacket instanceof ClientboundSetEntityDataPacket packet && !this.hc_skipCheck) {
+            int id = packet.id();
             Entity entity = this.player.getLevel().getEntity(id);
             final var hb = ((HealthbarPreferences) this.player).healthcarePrefs();
 
             if (entity instanceof LivingEntity living &&
                     hb.enabled &&
                     !(entity instanceof Player) &&
-                    !config.blacklistedEntities.contains(Registry.ENTITY_TYPE.getKey(entity.getType()).toString()) &&
+                    !config.blacklistedEntities.contains(BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString()) &&
                     !entity.isInvisibleTo(player)) {
 
-                var trackedValues = new ArrayList<>(((EntityTrackerUpdateS2CPacketAccessor) packet).getPackedItems());
+                var trackedValues = new ArrayList<>(packet.packedItems());
 
                 // Removing current custom name
-                var customName = trackedValues.stream().filter(value -> value.getAccessor().getId() == 2).findFirst();
+                var customName = trackedValues.stream().filter(value -> value.id() == 2).findFirst();
 
                 // Ensure name is visible only if mob is not too far away
                 boolean visible = (entity.distanceTo(player) < config.activationRange || entity.isCustomNameVisible()) && hb.alwaysVisible;
-                var visibleTag = new SynchedEntityData.DataItem<>(EntityAccessor.getNAME_VISIBLE(), visible);
+                var visibleTag = SynchedEntityData.DataValue.create(EntityAccessor.getNAME_VISIBLE(), visible);
 
                 float health = living.getHealth();
                 float maxHealth = living.getMaxHealth();
 
                 MutableComponent name = Component.empty();
-                if (customName.isPresent() && ((Optional<Component>) customName.get().getValue()).isPresent()) {
-                    name = ((Optional<Component>) customName.get().getValue()).get().copy().append(" ");
+                if (customName.isPresent() && ((Optional<Component>) customName.get().value()).isPresent()) {
+                    name = ((Optional<Component>) customName.get().value()).get().copy().append(" ");
                 } else if (entity.hasCustomName()) {
                     // @SpaceClouds42 saved me here, `.copy()` after getting custom name is essential!
                     name = entity.getCustomName().copy().append(" ");
@@ -100,17 +100,13 @@ public abstract class ServerPlayNetworkHandlerMixin_HealthTag {
                 }
 
                 var healthbar = ((HealthbarPreferences) this.player).createHealthbarText(health, maxHealth);
-                var healthTag = new SynchedEntityData.DataItem<>(EntityAccessor.getCUSTOM_NAME(), Optional.of(name.append(healthbar)));
+                var healthTag = SynchedEntityData.DataValue.create(EntityAccessor.getCUSTOM_NAME(), Optional.of(name.append(healthbar)));
 
                 Collections.addAll(trackedValues, visibleTag, healthTag);
 
                 // Create a new packet in order to not mess with other network handlers
                 // since same packet object is sent to every player
-                var trackerUpdatePacket = new ClientboundSetEntityDataPacket(id, this.hc_dummyTracker, false);
-                var accessor = (EntityTrackerUpdateS2CPacketAccessor) trackerUpdatePacket;
-
-                accessor.setId(id);
-                accessor.setPackedItems(trackedValues);
+                var trackerUpdatePacket = new ClientboundSetEntityDataPacket(id, trackedValues);
 
                 this.hc_skipCheck = true;
                 this.send(trackerUpdatePacket, listener);

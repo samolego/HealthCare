@@ -5,7 +5,6 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "EntityAccessor",
-    "EntityTrackerUpdateS2CPacketAccessor",
     "PlayerEntityMixinCast_Preferences",
     "ServerPlayNetworkHandlerMixin_HealthTag"
   ],

@@ -1,7 +1,7 @@
 import com.modrinth.minotaur.TaskModrinthUpload
 
 plugins {
-	id 'fabric-loom' version '0.12-SNAPSHOT'
+	id 'fabric-loom' version '1.0-SNAPSHOT'
 	id 'maven-publish'
 
 	// Quilt Mappings, for parameters and javadoc. Also hashed mojmap.
@@ -11,8 +11,8 @@ plugins {
 	id "com.modrinth.minotaur" version "1.1.0"
 }
 
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_16
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
 version = project.mod_version
@@ -21,7 +21,7 @@ group = project.maven_group
 def ENV = System.getenv()
 
 repositories {
-	maven { url 'https://jitpack.io'}
+	maven { url 'https://jitpack.io' }
 	maven { url "https://maven.architectury.dev/" }
 	maven { url 'https://maven.nucleoid.xyz' }
 	maven {
@@ -34,7 +34,7 @@ dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	mappings loom.layered {
-		it.addLayer(quiltMappings.mappings("org.quiltmc:quilt-mappings:${rootProject.minecraft_version}+build.${rootProject.quilt_mappings}:v2"))
+		//it.addLayer(quiltMappings.mappings("org.quiltmc:quilt-mappings:${rootProject.minecraft_version}+build.${rootProject.quilt_mappings}:v2"))
 		// https://lambdaurora.dev/tools/import_quilt.html
 		it.officialMojangMappings {
 			setNameSyntheticMembers(false)
