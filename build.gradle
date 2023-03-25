@@ -1,14 +1,12 @@
-import com.modrinth.minotaur.TaskModrinthUpload
-
 plugins {
-	id 'fabric-loom' version '1.0-SNAPSHOT'
+	id 'fabric-loom' version '1.1-SNAPSHOT'
 	id 'maven-publish'
 
 	// Quilt Mappings, for parameters and javadoc. Also hashed mojmap.
 	id "org.quiltmc.quilt-mappings-on-loom" version "4.2.0"
 
 	id "com.matthewprenger.cursegradle" version "1.4.0"
-	id "com.modrinth.minotaur" version "1.1.0"
+	id "com.modrinth.minotaur" version "2.+"
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -47,7 +45,7 @@ dependencies {
 	// LuckPerms
 	modImplementation(include('me.lucko:fabric-permissions-api:0.1-SNAPSHOT'))
 
-	modImplementation(include("fr.catcore:server-translations-api:${project.translations_version}"))
+	modImplementation(include("xyz.nucleoid:server-translations-api:${project.translations_version}"))
 
 	// Allows in game config editing
 	modImplementation(include("com.github.samolego.Config2Brigadier:config2brigadier-fabric:${project.c2b_version}"))
@@ -128,20 +126,19 @@ curseforge {
 	}
 }
 
-task modrinth(type: TaskModrinthUpload, dependsOn: remapJar) {
-	onlyIf {
-		ENV.MODRINTH_TOKEN
-	}
-
+modrinth {
 	token = ENV.MODRINTH_TOKEN
 	projectId = "NNqujQWr"
 	versionNumber = version
 	versionName = "[${project.minecraft_version}] Healthcare ${version}"
-	releaseType = "release"
+	versionType = "release"
 
 	uploadFile = file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")
 
-	addGameVersion("${project.minecraft_version}")
-	addLoader('fabric')
-	addLoader('quilt')
+	gameVersions = ["${project.minecraft_version}"]
+	loaders = ['fabric', 'quilt']
+
+	dependencies { // A special DSL for creating dependencies
+		required.project "fabric-api" // Creates a new required dependency on Fabric API
+	}
 }
