@@ -42,8 +42,8 @@ public class HealthcareCommand {
         HealthConfig newConfig = HealthConfig.loadConfigFile(CONFIG_FILE);
         config.reload(newConfig);
 
-        ctx.getSource().sendSuccess(
-                Component.translatable("healthcare.config_reload_success").withStyle(ChatFormatting.GREEN),
+        ctx.getSource().sendSuccess(() ->
+                        Component.translatable("healthcare.config_reload_success").withStyle(ChatFormatting.GREEN),
                 false
         );
         return 1;

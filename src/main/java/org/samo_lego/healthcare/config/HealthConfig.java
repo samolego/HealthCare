@@ -7,14 +7,7 @@ import org.samo_lego.config2brigadier.IBrigadierConfigurator;
 import org.samo_lego.config2brigadier.annotation.BrigadierDescription;
 import org.samo_lego.healthcare.healthbar.HealthbarStyle;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -55,7 +48,7 @@ public class HealthConfig implements IBrigadierConfigurator {
     @SerializedName("// The default style of healthbar. The following are available")
     public final String _comment_defaultStyle1 = Arrays.toString(HealthbarStyle.values());
     @BrigadierDescription(defaultOption = "PERCENTAGE")
-    public HealthbarStyle defaultStyle = HealthbarStyle.PERCENTAGE;
+    public HealthbarStyle defaultStyle = HealthbarStyle.SKYBLOCK;
 
     @SerializedName("// Whether healthbar is enabled by default.")
     public final String _comment_enabled = "";

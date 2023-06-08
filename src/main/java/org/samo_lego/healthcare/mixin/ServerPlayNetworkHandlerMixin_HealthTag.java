@@ -53,7 +53,7 @@ public abstract class ServerPlayNetworkHandlerMixin_HealthTag {
      * it accordingly to player's preferences if it is
      * an {@link ClientboundSetEntityDataPacket}.
      *
-     * @param packet   packet being sent
+     * @param sendPacket packet being sent
      * @param listener
      * @param ci
      */
@@ -68,7 +68,7 @@ public abstract class ServerPlayNetworkHandlerMixin_HealthTag {
     private void onPacketSend(Packet<?> sendPacket, PacketSendListener listener, CallbackInfo ci) {
         if (sendPacket instanceof ClientboundSetEntityDataPacket packet && !this.hc_skipCheck) {
             int id = packet.id();
-            Entity entity = this.player.getLevel().getEntity(id);
+            Entity entity = this.player.level().getEntity(id);
             final var hb = ((HealthbarPreferences) this.player).healthcarePrefs();
 
             if (entity instanceof LivingEntity living &&

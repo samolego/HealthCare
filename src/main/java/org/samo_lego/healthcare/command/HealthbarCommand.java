@@ -92,11 +92,11 @@ public class HealthbarCommand {
 
         preferences.healthcarePrefs().showType = allowEntityType;
 
-        context.getSource().sendSuccess(
-                Component.translatable("healthcare.healthbar.toggledType", allowEntityType)
-                        .withStyle(ChatFormatting.GREEN)
-                        .append("\n")
-                        .append(Component.translatable("healthcare.healthbar.reloadRequired").withStyle(ChatFormatting.GOLD)),
+        context.getSource().sendSuccess(() ->
+                        Component.translatable("healthcare.healthbar.toggledType", allowEntityType)
+                                .withStyle(ChatFormatting.GREEN)
+                                .append("\n")
+                                .append(Component.translatable("healthcare.healthbar.reloadRequired").withStyle(ChatFormatting.GOLD)),
                 false
         );
         return 1;
@@ -107,16 +107,16 @@ public class HealthbarCommand {
         int length = IntegerArgumentType.getInteger(context, "length");
         preferences.healthcarePrefs().customLength = length;
 
-        context.getSource().sendSuccess(
-                Component.translatable("healthcare.healthbar.customLengthSet", length)
-                        .withStyle(ChatFormatting.GREEN)
-                        .append("\n")
-                        .append(Component.translatable("healthcare.healthbar.reloadRequired").withStyle(ChatFormatting.GOLD)),
+        context.getSource().sendSuccess(() ->
+                        Component.translatable("healthcare.healthbar.customLengthSet", length)
+                                .withStyle(ChatFormatting.GREEN)
+                                .append("\n")
+                                .append(Component.translatable("healthcare.healthbar.reloadRequired").withStyle(ChatFormatting.GOLD)),
                 false
         );
         if (preferences.healthcarePrefs().healthbarStyle != HealthbarStyle.CUSTOM) {
-            context.getSource().sendSuccess(
-                    Component.translatable("healthcare.healthbar.useCustomStyle").withStyle(ChatFormatting.GOLD),
+            context.getSource().sendSuccess(() ->
+                            Component.translatable("healthcare.healthbar.useCustomStyle").withStyle(ChatFormatting.GOLD),
                     false
             );
         }
@@ -134,16 +134,16 @@ public class HealthbarCommand {
             preferences.healthcarePrefs().customEmptyChar = symbol;
         }
 
-        context.getSource().sendSuccess(
-                Component.translatable("healthcare.healthbar.customSymbolSet", full ? "Full" : "Empty", symbol)
-                        .withStyle(ChatFormatting.GREEN)
-                        .append("\n")
-                        .append(Component.translatable("healthcare.healthbar.reloadRequired").withStyle(ChatFormatting.GOLD)),
+        context.getSource().sendSuccess(() ->
+                        Component.translatable("healthcare.healthbar.customSymbolSet", full ? "Full" : "Empty", symbol)
+                                .withStyle(ChatFormatting.GREEN)
+                                .append("\n")
+                                .append(Component.translatable("healthcare.healthbar.reloadRequired").withStyle(ChatFormatting.GOLD)),
                 false
         );
         if (preferences.healthcarePrefs().healthbarStyle != HealthbarStyle.CUSTOM) {
-            context.getSource().sendSuccess(
-                    Component.translatable("healthcare.healthbar.useCustomStyle").withStyle(ChatFormatting.GOLD),
+            context.getSource().sendSuccess(() ->
+                            Component.translatable("healthcare.healthbar.useCustomStyle").withStyle(ChatFormatting.GOLD),
                     false
             );
         }
@@ -157,11 +157,11 @@ public class HealthbarCommand {
 
         preferences.healthcarePrefs().alwaysVisible = alwaysVisible;
 
-        context.getSource().sendSuccess(
-                Component.translatable("healthcare.healthbar.visibilitySet", alwaysVisible)
-                        .withStyle(ChatFormatting.GREEN)
-                        .append("\n")
-                        .append(Component.translatable("healthcare.healthbar.reloadRequired").withStyle(ChatFormatting.GOLD)),
+        context.getSource().sendSuccess(() ->
+                        Component.translatable("healthcare.healthbar.visibilitySet", alwaysVisible)
+                                .withStyle(ChatFormatting.GREEN)
+                                .append("\n")
+                                .append(Component.translatable("healthcare.healthbar.reloadRequired").withStyle(ChatFormatting.GOLD)),
                 false
         );
         return 1;
@@ -173,11 +173,11 @@ public class HealthbarCommand {
 
         preferences.healthcarePrefs().healthbarStyle = style;
 
-        context.getSource().sendSuccess(
-                Component.translatable("healthcare.healthbar.styleSet", style)
-                        .withStyle(ChatFormatting.GREEN)
-                        .append("\n")
-                        .append(Component.translatable("healthcare.healthbar.reloadRequired").withStyle(ChatFormatting.GOLD)),
+        context.getSource().sendSuccess(() ->
+                        Component.translatable("healthcare.healthbar.styleSet", style)
+                                .withStyle(ChatFormatting.GREEN)
+                                .append("\n")
+                                .append(Component.translatable("healthcare.healthbar.reloadRequired").withStyle(ChatFormatting.GOLD)),
                 false
         );
         return 1;
@@ -188,11 +188,11 @@ public class HealthbarCommand {
         boolean enabled = !preferences.healthcarePrefs().enabled;
         preferences.healthcarePrefs().enabled = enabled;
 
-        context.getSource().sendSuccess(
-                Component.translatable(enabled ? "healthcare.healthbar.healthbarEnabled" : "healthcare.healthbar.healthbarDisabled")
-                        .withStyle(ChatFormatting.GREEN)
-                        .append("\n")
-                        .append(Component.translatable("healthcare.healthbar.reloadRequired").withStyle(ChatFormatting.GOLD)),
+        context.getSource().sendSuccess(() ->
+                        Component.translatable(enabled ? "healthcare.healthbar.healthbarEnabled" : "healthcare.healthbar.healthbarDisabled")
+                                .withStyle(ChatFormatting.GREEN)
+                                .append("\n")
+                                .append(Component.translatable("healthcare.healthbar.reloadRequired").withStyle(ChatFormatting.GOLD)),
                 false
         );
 
