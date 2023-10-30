@@ -81,9 +81,12 @@ public abstract class ServerPlayNetworkHandlerMixin_HealthTag {
             boolean doMutate = false;
 
             for (var p : bundledPackets.subPackets()){
-                if (p instanceof ClientboundSetEntityDataPacket dataPacket && (p=TryMutatePacket(dataPacket)) != null)
+                if (p instanceof ClientboundSetEntityDataPacket dataPacket && (dataPacket=TryMutatePacket(dataPacket)) != null){
                     doMutate = true;
-                packets.add(p);
+                    packets.add(dataPacket);
+                }
+                else
+                    packets.add(p);
             }
 
             if (doMutate)
