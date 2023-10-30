@@ -5,6 +5,8 @@ import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBundlePacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
@@ -23,6 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.samo_lego.healthcare.HealthCare.config;
@@ -66,7 +69,40 @@ public abstract class ServerPlayNetworkHandlerMixin_HealthTag {
             cancellable = true
     )
     private void onPacketSend(Packet<?> sendPacket, PacketSendListener listener, CallbackInfo ci) {
-        if (sendPacket instanceof ClientboundSetEntityDataPacket packet && !this.hc_skipCheck) {
+        Packet<?> mutatedPacket = null;
+
+        if (hc_skipCheck)
+            return;
+
+        if (sendPacket instanceof ClientboundSetEntityDataPacket dataPacket)
+            mutatedPacket = TryMutatePacket(dataPacket);
+        else if (sendPacket instanceof ClientboundBundlePacket bundledPackets){
+            List<Packet<ClientGamePacketListener>> packets = new ArrayList<>();
+            boolean doMutate = false;
+
+            for (var p : bundledPackets.subPackets()){
+                if (p instanceof ClientboundSetEntityDataPacket dataPacket && (p=TryMutatePacket(dataPacket)) != null)
+                    doMutate = true;
+                packets.add(p);
+            }
+
+            if (doMutate)
+                mutatedPacket = new ClientboundBundlePacket(packets);
+        }
+
+        if (mutatedPacket != null) {
+            this.hc_skipCheck = true;
+            this.send(mutatedPacket, listener);
+            this.hc_skipCheck = false;
+            ci.cancel(); // cancel the original packet going out
+        }
+    }
+
+    /**
+     * @return A new packet, or null if the original needed not be mutated.
+     */
+    @Unique
+    private @Nullable ClientboundSetEntityDataPacket TryMutatePacket(ClientboundSetEntityDataPacket packet) {
             int id = packet.id();
             Entity entity = this.player.getLevel().getEntity(id);
             final var hb = ((HealthbarPreferences) this.player).healthcarePrefs();
@@ -106,13 +142,9 @@ public abstract class ServerPlayNetworkHandlerMixin_HealthTag {
 
                 // Create a new packet in order to not mess with other network handlers
                 // since same packet object is sent to every player
-                var trackerUpdatePacket = new ClientboundSetEntityDataPacket(id, trackedValues);
-
-                this.hc_skipCheck = true;
-                this.send(trackerUpdatePacket, listener);
-                this.hc_skipCheck = false;
-                ci.cancel(); // cancel the original packet going out
+                return new ClientboundSetEntityDataPacket(id, trackedValues);
             }
-        }
+            else
+                return null;
     }
 }
