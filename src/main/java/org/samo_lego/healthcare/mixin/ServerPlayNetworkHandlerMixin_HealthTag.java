@@ -103,48 +103,48 @@ public abstract class ServerPlayNetworkHandlerMixin_HealthTag {
      */
     @Unique
     private @Nullable ClientboundSetEntityDataPacket TryMutatePacket(ClientboundSetEntityDataPacket packet) {
-            int id = packet.id();
-            Entity entity = this.player.getLevel().getEntity(id);
-            final var hb = ((HealthbarPreferences) this.player).healthcarePrefs();
+        int id = packet.id();
+        Entity entity = this.player.getLevel().getEntity(id);
+        final var hb = ((HealthbarPreferences) this.player).healthcarePrefs();
 
-            if (entity instanceof LivingEntity living &&
-                    hb.enabled &&
-                    !(entity instanceof Player) &&
-                    !config.blacklistedEntities.contains(BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString()) &&
-                    !entity.isInvisibleTo(player)) {
+        if (!hb.enabled
+        || !(entity instanceof LivingEntity living)
+        || entity instanceof Player
+        || config.blacklistedEntities.contains(BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString())
+        || entity.isInvisibleTo(player)
+        ) {
+            return null;
+        }
 
-                var trackedValues = new ArrayList<>(packet.packedItems());
+        var trackedValues = new ArrayList<>(packet.packedItems());
 
-                // Removing current custom name
-                var customName = trackedValues.stream().filter(value -> value.id() == 2).findFirst();
+        // Removing current custom name
+        var customName = trackedValues.stream().filter(value -> value.id() == 2).findFirst();
 
-                // Ensure name is visible only if mob is not too far away
-                boolean visible = (entity.distanceTo(player) < config.activationRange || entity.isCustomNameVisible()) && hb.alwaysVisible;
-                var visibleTag = SynchedEntityData.DataValue.create(EntityAccessor.getNAME_VISIBLE(), visible);
+        // Ensure name is visible only if mob is not too far away
+        boolean visible = (entity.distanceTo(player) < config.activationRange || entity.isCustomNameVisible()) && hb.alwaysVisible;
+        var visibleTag = SynchedEntityData.DataValue.create(EntityAccessor.getNAME_VISIBLE(), visible);
 
-                float health = living.getHealth();
-                float maxHealth = living.getMaxHealth();
+        float health = living.getHealth();
+        float maxHealth = living.getMaxHealth();
 
-                MutableComponent name = Component.empty();
-                if (customName.isPresent() && ((Optional<Component>) customName.get().value()).isPresent()) {
-                    name = ((Optional<Component>) customName.get().value()).get().copy().append(" ");
-                } else if (entity.hasCustomName()) {
-                    // @SpaceClouds42 saved me here, `.copy()` after getting custom name is essential!
-                    name = entity.getCustomName().copy().append(" ");
-                } else if (hb.showType) {
-                    name = Component.translatable(entity.getType().getDescriptionId()).append(" ");
-                }
+        MutableComponent name = Component.empty();
+        if (customName.isPresent() && ((Optional<Component>) customName.get().value()).isPresent()) {
+            name = ((Optional<Component>) customName.get().value()).get().copy().append(" ");
+        } else if (entity.hasCustomName()) {
+            // @SpaceClouds42 saved me here, `.copy()` after getting custom name is essential!
+            name = entity.getCustomName().copy().append(" ");
+        } else if (hb.showType) {
+            name = Component.translatable(entity.getType().getDescriptionId()).append(" ");
+        }
 
-                var healthbar = ((HealthbarPreferences) this.player).createHealthbarText(health, maxHealth);
-                var healthTag = SynchedEntityData.DataValue.create(EntityAccessor.getCUSTOM_NAME(), Optional.of(name.append(healthbar)));
+        var healthbar = ((HealthbarPreferences) this.player).createHealthbarText(health, maxHealth);
+        var healthTag = SynchedEntityData.DataValue.create(EntityAccessor.getCUSTOM_NAME(), Optional.of(name.append(healthbar)));
 
-                Collections.addAll(trackedValues, visibleTag, healthTag);
+        Collections.addAll(trackedValues, visibleTag, healthTag);
 
-                // Create a new packet in order to not mess with other network handlers
-                // since same packet object is sent to every player
-                return new ClientboundSetEntityDataPacket(id, trackedValues);
-            }
-            else
-                return null;
+        // Create a new packet in order to not mess with other network handlers
+        // since same packet object is sent to every player
+        return new ClientboundSetEntityDataPacket(id, trackedValues);
     }
 }
