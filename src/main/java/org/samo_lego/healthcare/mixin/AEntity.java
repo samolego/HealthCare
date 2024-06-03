@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import java.util.Optional;
 
 @Mixin(Entity.class)
-public interface EntityAccessor {
+public interface AEntity {
     @Accessor("DATA_CUSTOM_NAME_VISIBLE")
     static EntityDataAccessor<Boolean> getNAME_VISIBLE() {
         throw new AssertionError();

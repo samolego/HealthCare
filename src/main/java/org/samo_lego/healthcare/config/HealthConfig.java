@@ -7,7 +7,14 @@ import org.samo_lego.config2brigadier.IBrigadierConfigurator;
 import org.samo_lego.config2brigadier.annotation.BrigadierDescription;
 import org.samo_lego.healthcare.healthbar.HealthbarStyle;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -45,9 +52,15 @@ public class HealthConfig implements IBrigadierConfigurator {
     @BrigadierDescription(defaultOption = "true")
     public boolean showType = true;
 
+
+    @SerializedName("// Whether to show rpg level of the mob if rpgdifficulty is installed.")
+    public final String _comment_showRpgLevel = "";
+    @BrigadierDescription(defaultOption = "true")
+    public boolean showRpgLevel = true;
+
     @SerializedName("// The default style of healthbar. The following are available")
     public final String _comment_defaultStyle1 = Arrays.toString(HealthbarStyle.values());
-    @BrigadierDescription(defaultOption = "PERCENTAGE")
+    @BrigadierDescription(defaultOption = "SKYBLOCK")
     public HealthbarStyle defaultStyle = HealthbarStyle.SKYBLOCK;
 
     @SerializedName("// Whether healthbar is enabled by default.")

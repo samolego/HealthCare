@@ -4,9 +4,10 @@
   "package": "org.samo_lego.healthcare.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "EntityAccessor",
+    "AEntity",
+    "AServerGamePacketListenerImpl",
     "PlayerEntityMixinCast_Preferences",
-    "ServerPlayNetworkHandlerMixin_HealthTag"
+    "ServerCommonPacketListenerMixin_HealthTag"
   ],
   "client": [],
   "injectors": {
