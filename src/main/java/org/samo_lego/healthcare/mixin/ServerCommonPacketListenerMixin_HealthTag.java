@@ -10,7 +10,7 @@ import net.minecraft.network.protocol.game.ClientboundBundlePacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.server.network.ServerCommonPacketListenerImpl;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -25,31 +25,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import static org.samo_lego.healthcare.HealthCare.config;
 
-@Mixin(ServerGamePacketListenerImpl.class)
-public abstract class ServerPlayNetworkHandlerMixin_HealthTag {
-    @Shadow
-    public ServerPlayer player;
+@Mixin(ServerCommonPacketListenerImpl.class)
+public abstract class ServerCommonPacketListenerMixin_HealthTag {
 
     @Shadow
     public abstract void send(Packet<?> packet, @Nullable PacketSendListener packetSendListener);
 
     @Unique
     private boolean hc_skipCheck;
-
-    /**
-     * Dummy handler used for creating modified
-     * packets with health.
-     * This is used instead of real entity datatracker since
-     * we don't want its values to get marked
-     * as non-dirty upon sending the fake packet.
-     */
-    @Unique
-    private final SynchedEntityData hc_dummyTracker = new SynchedEntityData(null);
 
     /**
      * Gets the current packet being sent and modifies
@@ -64,33 +51,38 @@ public abstract class ServerPlayNetworkHandlerMixin_HealthTag {
             method = "send(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketSendListener;)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/network/Connection;send(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketSendListener;)V"
+                    target = "Lnet/minecraft/network/Connection;send(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketSendListener;Z)V"
             ),
             cancellable = true
     )
     private void onPacketSend(Packet<?> sendPacket, PacketSendListener listener, CallbackInfo ci) {
         Packet<?> mutatedPacket = null;
 
-        if (hc_skipCheck)
+        if (hc_skipCheck || !(this instanceof AServerGamePacketListenerImpl gamePacketListener)) {
             return;
+        }
 
-        if (sendPacket instanceof ClientboundSetEntityDataPacket dataPacket)
-            mutatedPacket = TryMutatePacket(dataPacket);
-        else if (sendPacket instanceof ClientboundBundlePacket bundledPackets){
-            List<Packet<ClientGamePacketListener>> packets = new ArrayList<>();
+
+        var player = gamePacketListener.getPlayer();
+
+        if (sendPacket instanceof ClientboundSetEntityDataPacket dataPacket) {
+            mutatedPacket = TryMutatePacket(dataPacket, player);
+        } else if (sendPacket instanceof ClientboundBundlePacket bundledPackets) {
+            var packets = new ArrayList<Packet<? super ClientGamePacketListener>>();
             boolean doMutate = false;
 
-            for (var p : bundledPackets.subPackets()){
-                if (p instanceof ClientboundSetEntityDataPacket dataPacket && (dataPacket=TryMutatePacket(dataPacket)) != null){
+            for (var p : bundledPackets.subPackets()) {
+                if (p instanceof ClientboundSetEntityDataPacket dataPacket && (dataPacket = TryMutatePacket(dataPacket, player)) != null) {
                     doMutate = true;
                     packets.add(dataPacket);
-                }
-                else
+                } else {
                     packets.add(p);
+                }
             }
 
-            if (doMutate)
+            if (doMutate) {
                 mutatedPacket = new ClientboundBundlePacket(packets);
+            }
         }
 
         if (mutatedPacket != null) {
@@ -105,16 +97,16 @@ public abstract class ServerPlayNetworkHandlerMixin_HealthTag {
      * @return A new packet, or null if the original needed not be mutated.
      */
     @Unique
-    private @Nullable ClientboundSetEntityDataPacket TryMutatePacket(ClientboundSetEntityDataPacket packet) {
+    private @Nullable ClientboundSetEntityDataPacket TryMutatePacket(ClientboundSetEntityDataPacket packet, ServerPlayer player) {
         int id = packet.id();
-        Entity entity = this.player.level().getEntity(id);
-        final var hb = ((HealthbarPreferences) this.player).healthcarePrefs();
+        Entity entity = player.level().getEntity(id);
+        final var hb = ((HealthbarPreferences) player).healthcarePrefs();
 
         if (!hb.enabled
-        || !(entity instanceof LivingEntity living)
-        || entity instanceof Player
-        || config.blacklistedEntities.contains(BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString())
-        || entity.isInvisibleTo(player)
+                || !(entity instanceof LivingEntity living)
+                || entity instanceof Player
+                || config.blacklistedEntities.contains(BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString())
+                || entity.isInvisibleTo(player)
         ) {
             return null;
         }
@@ -126,7 +118,7 @@ public abstract class ServerPlayNetworkHandlerMixin_HealthTag {
 
         // Ensure name is visible only if mob is not too far away
         boolean visible = (entity.distanceTo(player) < config.activationRange || entity.isCustomNameVisible()) && hb.alwaysVisible;
-        var visibleTag = SynchedEntityData.DataValue.create(EntityAccessor.getNAME_VISIBLE(), visible);
+        var visibleTag = SynchedEntityData.DataValue.create(AEntity.getNAME_VISIBLE(), visible);
 
         float health = living.getHealth();
         float maxHealth = living.getMaxHealth();
@@ -141,8 +133,8 @@ public abstract class ServerPlayNetworkHandlerMixin_HealthTag {
             name = Component.translatable(entity.getType().getDescriptionId()).append(" ");
         }
 
-        var healthbar = ((HealthbarPreferences) this.player).createHealthbarText(health, maxHealth);
-        var healthTag = SynchedEntityData.DataValue.create(EntityAccessor.getCUSTOM_NAME(), Optional.of(name.append(healthbar)));
+        var healthbar = ((HealthbarPreferences) player).createHealthbarText(health, maxHealth);
+        var healthTag = SynchedEntityData.DataValue.create(AEntity.getCUSTOM_NAME(), Optional.of(name.append(healthbar)));
 
         Collections.addAll(trackedValues, visibleTag, healthTag);
 
