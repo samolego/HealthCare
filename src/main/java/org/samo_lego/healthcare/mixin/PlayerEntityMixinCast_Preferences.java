@@ -20,7 +20,7 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
 
 
     @Override
-    public MutableComponent createHealthbarText(float health, float maxHealth) {
+    public MutableComponent healthcare_createHealthbarText(float health, float maxHealth) {
         if (health < 0.0F) {
             health = 0.0F;
         }
@@ -55,7 +55,7 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
     }
 
     @Override
-    public PlayerHealthbar healthcarePrefs() {
+    public PlayerHealthbar healthcare_healthcarePrefs() {
         return this.hc_healthbar;
     }
 }

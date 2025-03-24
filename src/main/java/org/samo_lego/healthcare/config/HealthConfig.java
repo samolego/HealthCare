@@ -3,16 +3,14 @@ package org.samo_lego.healthcare.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
-import org.samo_lego.config2brigadier.IBrigadierConfigurator;
-import org.samo_lego.config2brigadier.annotation.BrigadierDescription;
+import net.fabricmc.loader.api.FabricLoader;
+import org.samo_lego.config2brigadier.common.IBrigadierConfigurator;
+import org.samo_lego.config2brigadier.common.annotation.BrigadierDescription;
 import org.samo_lego.healthcare.healthbar.HealthbarStyle;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
@@ -53,10 +51,10 @@ public class HealthConfig implements IBrigadierConfigurator {
     public boolean showType = true;
 
 
-    @SerializedName("// Whether to show rpg level of the mob if rpgdifficulty is installed.")
-    public final String _comment_showRpgLevel = "";
+    @SerializedName("// Whether to show mob level if mod that increases mob health is installed.")
+    public final String _comment_showMobLevel = "";
     @BrigadierDescription(defaultOption = "true")
-    public boolean showRpgLevel = true;
+    public boolean showMobLevel = true;
 
     @SerializedName("// The default style of healthbar. The following are available")
     public final String _comment_defaultStyle1 = Arrays.toString(HealthbarStyle.values());
@@ -77,7 +75,11 @@ public class HealthConfig implements IBrigadierConfigurator {
 
     @Override
     public void save() {
-       this.saveConfigFile(CONFIG_FILE);
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(CONFIG_FILE), StandardCharsets.UTF_8)) {
+            gson.toJson(this, writer);
+        } catch (IOException e) {
+            getLogger(MODID).error("Problem occurred when saving config: {}", e.getMessage());
+        }
     }
 
     /**
@@ -87,34 +89,6 @@ public class HealthConfig implements IBrigadierConfigurator {
      * @return HealthConfig object
      */
     public static HealthConfig loadConfigFile(File file) {
-        HealthConfig config = null;
-        if (file.exists()) {
-            try (BufferedReader fileReader = new BufferedReader(
-                    new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)
-            )) {
-                config = gson.fromJson(fileReader, HealthConfig.class);
-            } catch (IOException e) {
-                throw new RuntimeException(MODID + " Problem occurred when trying to load config: ", e);
-            }
-        }
-        if (config == null) {
-            config = new HealthConfig();
-        }
-        config.save();
-
-        return config;
-    }
-
-    /**
-     * Saves the config to the given file.
-     *
-     * @param file file to save config to
-     */
-    public void saveConfigFile(File file) {
-        try (Writer writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
-            gson.toJson(this, writer);
-        } catch (IOException e) {
-            getLogger(MODID).error("Problem occurred when saving config: " + e.getMessage());
-        }
+        return IBrigadierConfigurator.loadConfigFile(file, HealthConfig.class, HealthConfig::new);
     }
 }

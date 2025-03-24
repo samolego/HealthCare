@@ -1,5 +1,6 @@
 package org.samo_lego.healthcare.mixin;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.chat.Component;
@@ -15,6 +16,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
+import org.samo_lego.healthcare.compatibility.MobLevel;
 import org.samo_lego.healthcare.healthbar.HealthbarPreferences;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -44,8 +46,6 @@ public abstract class ServerCommonPacketListenerMixin_HealthTag {
      * an {@link ClientboundSetEntityDataPacket}.
      *
      * @param sendPacket packet being sent
-     * @param listener
-     * @param ci
      */
     @Inject(
             method = "send(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketSendListener;)V",
@@ -66,13 +66,13 @@ public abstract class ServerCommonPacketListenerMixin_HealthTag {
         var player = gamePacketListener.getPlayer();
 
         if (sendPacket instanceof ClientboundSetEntityDataPacket dataPacket) {
-            mutatedPacket = TryMutatePacket(dataPacket, player);
+            mutatedPacket = tryMutatePacket(dataPacket, player);
         } else if (sendPacket instanceof ClientboundBundlePacket bundledPackets) {
             var packets = new ArrayList<Packet<? super ClientGamePacketListener>>();
             boolean doMutate = false;
 
             for (var p : bundledPackets.subPackets()) {
-                if (p instanceof ClientboundSetEntityDataPacket dataPacket && (dataPacket = TryMutatePacket(dataPacket, player)) != null) {
+                if (p instanceof ClientboundSetEntityDataPacket dataPacket && (dataPacket = tryMutatePacket(dataPacket, player)) != null) {
                     doMutate = true;
                     packets.add(dataPacket);
                 } else {
@@ -97,10 +97,10 @@ public abstract class ServerCommonPacketListenerMixin_HealthTag {
      * @return A new packet, or null if the original needed not be mutated.
      */
     @Unique
-    private @Nullable ClientboundSetEntityDataPacket TryMutatePacket(ClientboundSetEntityDataPacket packet, ServerPlayer player) {
+    private @Nullable ClientboundSetEntityDataPacket tryMutatePacket(ClientboundSetEntityDataPacket packet, ServerPlayer player) {
         int id = packet.id();
         Entity entity = player.level().getEntity(id);
-        final var hb = ((HealthbarPreferences) player).healthcarePrefs();
+        final var hb = ((HealthbarPreferences) player).healthcare_healthcarePrefs();
 
         if (!hb.enabled
                 || !(entity instanceof LivingEntity living)
@@ -123,17 +123,24 @@ public abstract class ServerCommonPacketListenerMixin_HealthTag {
         float health = living.getHealth();
         float maxHealth = living.getMaxHealth();
 
-        MutableComponent name = Component.empty();
+        MutableComponent name = Component.literal("");
+        
+        // Add rpg difficulty stats
+        if (config.showMobLevel) {
+            var mobLevel = MobLevel.getLevel(living);
+            name.append(Component.literal("[Lv. ").append(Component.literal(String.valueOf(mobLevel)).withStyle(ChatFormatting.YELLOW)).append("]").append(" "));
+        }
+        
         if (customName.isPresent() && ((Optional<Component>) customName.get().value()).isPresent()) {
-            name = ((Optional<Component>) customName.get().value()).get().copy().append(" ");
+            name.append(((Optional<Component>) customName.get().value()).get().copy().append(" "));
         } else if (entity.hasCustomName()) {
             // @SpaceClouds42 saved me here, `.copy()` after getting custom name is essential!
-            name = entity.getCustomName().copy().append(" ");
+            name.append(entity.getCustomName().copy().append(" "));
         } else if (hb.showType) {
-            name = Component.translatable(entity.getType().getDescriptionId()).append(" ");
+            name.append(Component.translatable(entity.getType().getDescriptionId()).append(" "));
         }
 
-        var healthbar = ((HealthbarPreferences) player).createHealthbarText(health, maxHealth);
+        var healthbar = ((HealthbarPreferences) player).healthcare_createHealthbarText(health, maxHealth);
         var healthTag = SynchedEntityData.DataValue.create(AEntity.getCUSTOM_NAME(), Optional.of(name.append(healthbar)));
 
         Collections.addAll(trackedValues, visibleTag, healthTag);

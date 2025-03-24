@@ -16,11 +16,11 @@ public class PlayerDataEvent implements ServerPlayerEvents.CopyFrom {
      */
     @Override
     public void copyFromPlayer(ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean alive) {
-        final var healthbar = ((HealthbarPreferences) oldPlayer).healthcarePrefs();
+        final var healthbar = ((HealthbarPreferences) oldPlayer).healthcare_healthcarePrefs();
 
         CompoundTag tag = new CompoundTag();
         healthbar.toTag(tag);
 
-        ((HealthbarPreferences) newPlayer).healthcarePrefs().fromTag(tag);
+        ((HealthbarPreferences) newPlayer).healthcare_healthcarePrefs().fromTag(tag);
     }
 }

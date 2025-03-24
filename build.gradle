@@ -1,24 +1,37 @@
 plugins {
-	id 'fabric-loom' version '1.6-SNAPSHOT'
+	id 'fabric-loom' version '1.10-SNAPSHOT'
 	id 'maven-publish'
 
 	id "com.matthewprenger.cursegradle" version "1.4.0"
 	id "com.modrinth.minotaur" version "2.+"
 }
 
-sourceCompatibility = JavaVersion.VERSION_20
-targetCompatibility = JavaVersion.VERSION_20
-
-archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
+base {
+	archivesName = project.archives_base_name
+}
+
 def ENV = System.getenv()
+
+loom {
+	splitEnvironmentSourceSets()
+
+	mods {
+		"modid" {
+			sourceSet sourceSets.main
+			sourceSet sourceSets.client
+		}
+	}
+
+}
 
 repositories {
 	maven { url 'https://jitpack.io' }
 	maven { url "https://maven.architectury.dev" }
 	maven { url 'https://maven.nucleoid.xyz' }
+	maven { url "https://api.modrinth.com/maven" }
 	maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 	maven { url 'https://maven.terraformersmc.com/releases' }
 }
@@ -39,13 +52,16 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	// LuckPerms
-	modImplementation(include('me.lucko:fabric-permissions-api:0.2-SNAPSHOT'))
-
+	modImplementation(include("me.lucko:fabric-permissions-api:${project.permissions_version}"))
 	modImplementation(include("xyz.nucleoid:server-translations-api:${project.translations_version}"))
-	//modImplementation("com.github.Globox1997:RpgDifficulty:${project.rpg_difficulty_version}")
 
 	// Allows in game config editing
-	modImplementation(include("com.github.samolego.Config2Brigadier:config2brigadier-fabric:${project.c2b_version}"))
+	modImplementation(include("com.github.samolego:Config2Brigadier:${project.c2b_version}"))
+
+	// RpgDifficulty
+	modCompileOnly ("maven.modrinth:rpgdifficulty:${project.rpg_difficulty_version}"){
+		exclude(group: "net.fabricmc.fabric-api")
+	}
 }
 
 processResources {
@@ -57,26 +73,24 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	// ensure that the encoding is set to UTF-8, no matter what the system default is
-	// this fixes some edge cases with special characters not displaying correctly
-	// see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
-	// If Javadoc is generated, this must be specified in that task too.
-	it.options.encoding = "UTF-8"
-
 	it.options.release = 21
 }
-
 
 java {
 	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
 	// if it is present.
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
+
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {
+	inputs.property "archivesName", project.base.archivesName
+
 	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}"}
+		rename { "${it}_${inputs.properties.archivesName}"}
 	}
 }
 
@@ -102,19 +116,24 @@ curseforge {
 
 	project {
 		id = "466750"
-		changelog = "A changelog can be found at https://github.com/samolego/HealthCare/releases/latest"
-		releaseType = "release"
-		addGameVersion "${project.minecraft_version}"
-		addGameVersion "Fabric"
-		addGameVersion "Quilt"
+		changelog = ENV.CHANGELOG ?: "A changelog can be found at https://github.com/samolego/HealthCare/releases/tag/${version}"
+        releaseType = "release"
+        if (project.minecraft_version.contains("-")) {
+            // yuck
+            addGameVersion "${project.minecraft_version.split("-")[0]}-Snapshot"
+        } else {
+            addGameVersion "${project.minecraft_version}"
+        }
+        addGameVersion "Fabric"
+        addGameVersion "Quilt"
 
-		mainArtifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")) {
-			displayName = "[${project.minecraft_version}] Healthcare ${version}"
-		}
+        mainArtifact(remapJar.archiveFile) {
+            displayName = "[${project.minecraft_version}] HealthCare ${version}"
+        }
 
-		afterEvaluate {
-			uploadTask.dependsOn("remapJar")
-		}
+        afterEvaluate {
+            uploadTask.dependsOn("remapJar")
+        }
 	}
 
 	options {
@@ -125,14 +144,15 @@ curseforge {
 modrinth {
 	token = ENV.MODRINTH_TOKEN
 	projectId = "NNqujQWr"
-	versionNumber = version
-	versionName = "[${project.minecraft_version}] Healthcare ${version}"
-	versionType = "release"
+    changelog = ENV.CHANGELOG ?: "A changelog can be found at https://github.com/samolego/HealthCare/releases/tag/${version}"
+    versionNumber = version
+    versionName = "[${project.minecraft_version}] HealthCare ${version}"
+    versionType = "release"
 
-	uploadFile = file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")
+    uploadFile = remapJar.archiveFile
 
-	gameVersions = ["${project.minecraft_version}"]
-	loaders = ['fabric', 'quilt']
+    gameVersions = [project.minecraft_version]
+    loaders = ['fabric', 'quilt']
 
 	dependencies { // A special DSL for creating dependencies
 		required.project "fabric-api" // Creates a new required dependency on Fabric API
