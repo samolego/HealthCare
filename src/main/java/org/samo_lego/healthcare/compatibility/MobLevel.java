@@ -4,6 +4,8 @@ import net.fabricmc.fabric.mixin.object.builder.DefaultAttributeRegistryAccessor
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 
+import static org.samo_lego.healthcare.HealthCare.config;
+
 public class MobLevel {
     /**
      * Calculates the level of a mob.
@@ -12,9 +14,7 @@ public class MobLevel {
      * @return
      */
     public static int getLevel(LivingEntity mob) {
-        int multiplier = 10;
-
-        return (int) (multiplier * mob.getAttributeBaseValue(Attributes.MAX_HEALTH)
-                / Math.abs(DefaultAttributeRegistryAccessor.getRegistry().get(mob.getType()).getBaseValue(Attributes.MAX_HEALTH))) - multiplier + 1;
+        return (int) (config.mobLevels.mobLevelMultiplier * mob.getAttributeBaseValue(Attributes.MAX_HEALTH)
+                / Math.abs(DefaultAttributeRegistryAccessor.getRegistry().get(mob.getType()).getBaseValue(Attributes.MAX_HEALTH))) - config.mobLevels.mobLevelMultiplier + 1;
     }
 }

@@ -12,6 +12,7 @@ import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerCommonPacketListenerImpl;
+import net.minecraft.world.Nameable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -125,10 +126,10 @@ public abstract class ServerCommonPacketListenerMixin_HealthTag {
 
         MutableComponent name = Component.literal("");
         
-        // Add rpg difficulty stats
-        if (config.showMobLevel) {
+        // Add mob level stats
+        if (config.mobLevels.showMobLevel) {
             var mobLevel = MobLevel.getLevel(living);
-            name.append(Component.literal("[Lv. ").append(Component.literal(String.valueOf(mobLevel)).withStyle(ChatFormatting.YELLOW)).append("]").append(" "));
+            name.append(Component.literal(String.format(config.mobLevels.mobLevelText, mobLevel)).withStyle(ChatFormatting.YELLOW)).append(" ");
         }
         
         if (customName.isPresent() && ((Optional<Component>) customName.get().value()).isPresent()) {

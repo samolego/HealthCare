@@ -51,10 +51,26 @@ public class HealthConfig implements IBrigadierConfigurator {
     public boolean showType = true;
 
 
-    @SerializedName("// Whether to show mob level if mod that increases mob health is installed.")
-    public final String _comment_showMobLevel = "";
-    @BrigadierDescription(defaultOption = "true")
-    public boolean showMobLevel = true;
+    @SerializedName("// Compatibility with Nameplate / other mob 'buffing' mods.")
+    public String _comment_mobLevels = "";
+    @SerializedName("mob_levels")
+    public MobLevels mobLevels = new MobLevels();
+    public static class MobLevels {
+        @SerializedName("// Whether to show mob level")
+        public final String _comment_showMobLevel = "";
+        @BrigadierDescription(defaultOption = "true")
+        public boolean showMobLevel = true;
+
+        @SerializedName("// Mob level display text")
+        public final String _comment_mobLevelText = "";
+        @BrigadierDescription(defaultOption = "\"[Lv. %d]\"")
+        public String mobLevelText = "[Lv. %d]";
+
+        @SerializedName("// Mob level multiplier. Used in formula from Nameplate")
+        public final String _comment_mobLevelMultiplier = "";
+        @SerializedName("level_multiplier")
+        public int mobLevelMultiplier = 10;
+    }
 
     @SerializedName("// The default style of healthbar. The following are available")
     public final String _comment_defaultStyle1 = Arrays.toString(HealthbarStyle.values());
