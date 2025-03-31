@@ -1,5 +1,6 @@
 package org.samo_lego.healthcare.mixin;
 
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.PacketSendListener;
@@ -18,6 +19,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 import org.samo_lego.healthcare.compatibility.MobLevel;
+import org.samo_lego.healthcare.compatibility.Polymer;
 import org.samo_lego.healthcare.healthbar.HealthbarPreferences;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -25,6 +27,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -106,7 +109,8 @@ public abstract class ServerCommonPacketListenerMixin_HealthTag {
         if (!hb.enabled
                 || !(entity instanceof LivingEntity living)
                 || entity instanceof Player
-                || config.blacklistedEntities.contains(BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString())
+                //|| FabricLoader.getInstance().isModLoaded("polymer") && Polymer.isPolymerPlayerEntity(entity, PacketContext.get())
+                || config.isEntityBlacklisted(entity)
                 || entity.isInvisibleTo(player)
         ) {
             return null;

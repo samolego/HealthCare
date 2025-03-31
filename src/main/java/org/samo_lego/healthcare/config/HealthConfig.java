@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.entity.Entity;
 import org.samo_lego.config2brigadier.common.IBrigadierConfigurator;
 import org.samo_lego.config2brigadier.common.annotation.BrigadierDescription;
 import org.samo_lego.healthcare.healthbar.HealthbarStyle;
@@ -15,11 +17,16 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 import static org.samo_lego.healthcare.HealthCare.CONFIG_FILE;
 import static org.samo_lego.healthcare.HealthCare.MODID;
+import static org.samo_lego.healthcare.HealthCare.config;
 
 public class HealthConfig implements IBrigadierConfigurator {
     private static final Gson gson = new GsonBuilder()
@@ -28,13 +35,13 @@ public class HealthConfig implements IBrigadierConfigurator {
             .disableHtmlEscaping()
             .create();
 
-    public final String _comment_blacklistedEntities = "// Which entities shouldn't have a healthbar above their name.";
+    public final String _comment_blacklistedEntities = "// Which entities shouldn't have a healthbar above their name. Typing * will match any entity from mod.";
     @SerializedName("blacklisted_entities")
-    @BrigadierDescription(defaultOption = "[\"taterzens:npc\",\"specialmobs:mob_with_hidden_health\"]")
-    public List<String> blacklistedEntities = Arrays.asList(
+    public Set<String> blacklistedEntities = new HashSet<>(Set.of(
             "taterzens:npc",
-            "specialmobs:mob_with_hidden_health"
-    );
+            "specialmobs:mob_with_hidden_health",
+            "another_mod:*"
+    ));
     @SerializedName("// When to activate the healthbar.")
     public String _comment_activationRange = "";
     @BrigadierDescription(defaultOption = "8.0")
@@ -55,6 +62,12 @@ public class HealthConfig implements IBrigadierConfigurator {
     public String _comment_mobLevels = "";
     @SerializedName("mob_levels")
     public MobLevels mobLevels = new MobLevels();
+
+    public boolean isEntityBlacklisted(Entity entity) {
+        var key = BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType());
+        return config.blacklistedEntities.contains(key.toString()) || config.blacklistedEntities.contains(key.getNamespace() + ":*");
+    }
+
     public static class MobLevels {
         @SerializedName("// Whether to show mob level")
         public final String _comment_showMobLevel = "";

@@ -58,10 +58,8 @@ dependencies {
 	// Allows in game config editing
 	modImplementation(include("com.github.samolego:Config2Brigadier:${project.c2b_version}"))
 
-	// RpgDifficulty
-	modCompileOnly ("maven.modrinth:rpgdifficulty:${project.rpg_difficulty_version}"){
-		exclude(group: "net.fabricmc.fabric-api")
-	}
+	modCompileOnly("eu.pb4:polymer-core:${project.polymer_version}")
+	modCompileOnly("eu.pb4:polymer-virtual-entity:${project.polymer_version}")
 }
 
 processResources {
