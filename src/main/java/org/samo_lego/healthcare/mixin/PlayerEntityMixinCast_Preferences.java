@@ -48,10 +48,7 @@ public class PlayerEntityMixinCast_Preferences implements HealthbarPreferences {
 
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
     private void readCustomDataFromTag(CompoundTag tag, CallbackInfo ci) {
-        if (tag.contains("Healthbar")) {
-            CompoundTag healthbar = tag.getCompound("Healthbar");
-            this.hc_healthbar.fromTag(healthbar);
-        }
+        tag.getCompound("Healthbar").ifPresent(this.hc_healthbar::fromTag);
     }
 
     @Override

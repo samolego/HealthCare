@@ -38,15 +38,15 @@ public class PlayerHealthbar {
     }
 
     public void fromTag(CompoundTag tag) {
-        this.healthbarStyle = HealthbarStyle.valueOf(tag.getString("Style"));
-        this.enabled = tag.getBoolean("Enabled");
-        this.showType = tag.getBoolean("ShowType");
-        this.alwaysVisible = tag.getBoolean("AlwaysVisible");
+        this.healthbarStyle = HealthbarStyle.valueOf(tag.getString("Style").orElse(this.healthbarStyle.name()));
+        this.enabled = tag.getBoolean("Enabled").orElse(this.enabled);
+        this.showType = tag.getBoolean("ShowType").orElse(this.showType);
+        this.alwaysVisible = tag.getBoolean("AlwaysVisible").orElse(this.alwaysVisible);
 
         if (this.healthbarStyle == HealthbarStyle.CUSTOM) {
-            this.customFullChar = (char) tag.getInt("FullChar");
-            this.customEmptyChar = (char) tag.getInt("EmptyChar");
-            this.customLength = tag.getInt("Length");
+            this.customFullChar = tag.getInt("FullChar").map(integer -> (char) integer.intValue()).orElse(this.customFullChar);
+            this.customEmptyChar = tag.getInt("EmptyChar").map(integer -> (char) integer.intValue()).orElse(this.customEmptyChar);
+            this.customLength = tag.getInt("Length").orElse(this.customLength);
         }
     }
 }

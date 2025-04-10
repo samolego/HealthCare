@@ -1,6 +1,5 @@
 package org.samo_lego.healthcare.mixin;
 
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.chat.Component;
