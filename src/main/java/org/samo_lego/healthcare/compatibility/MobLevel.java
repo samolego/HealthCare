@@ -15,11 +15,9 @@ public class MobLevel {
      */
     public static int getLevel(LivingEntity mob) {
         int level = (int) (config.mobLevels.mobLevelMultiplier * mob.getAttributeBaseValue(Attributes.MAX_HEALTH)
-                / Math.abs(
-                        DefaultAttributeRegistryAccessor.getRegistry()
+                / DefaultAttributeRegistryAccessor.getRegistry()
                                 .get(mob.getType())
-                                .getBaseValue(Attributes.MAX_HEALTH) - config.mobLevels.mobLevelMultiplier) + 1
-        );
+                                .getBaseValue(Attributes.MAX_HEALTH)) - config.mobLevels.mobLevelMultiplier + 1;
         if (level < 1) {
             return 1;
         }
