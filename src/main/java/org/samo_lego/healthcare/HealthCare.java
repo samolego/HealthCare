@@ -16,6 +16,8 @@ public class HealthCare implements ModInitializer {
 
 	public static final File CONFIG_FILE = new File(FabricLoader.getInstance().getConfigDir() + "/health_config.json");
 
+	public static final boolean POLYMER_LOADED = FabricLoader.getInstance().isModLoaded("polymer-core");
+
 	public static HealthConfig config;
 
 	@Override

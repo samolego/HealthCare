@@ -2,7 +2,6 @@ package org.samo_lego.healthcare.mixin;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -13,13 +12,13 @@ import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerCommonPacketListenerImpl;
-import net.minecraft.world.Nameable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
+import org.samo_lego.healthcare.HealthCare;
 import org.samo_lego.healthcare.compatibility.MobLevel;
-import org.samo_lego.healthcare.compatibility.Polymer;
+import org.samo_lego.healthcare.compatibility.PolymerCompat;
 import org.samo_lego.healthcare.healthbar.HealthbarPreferences;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -109,7 +108,7 @@ public abstract class ServerCommonPacketListenerMixin_HealthTag {
         if (!hb.enabled
                 || !(entity instanceof LivingEntity living)
                 || entity instanceof Player
-                //|| FabricLoader.getInstance().isModLoaded("polymer") && Polymer.isPolymerPlayerEntity(entity, PacketContext.get())
+                || HealthCare.POLYMER_LOADED && PolymerCompat.isPolymerEntity(entity, PacketContext.get())
                 || config.isEntityBlacklisted(entity)
                 || entity.isInvisibleTo(player)
         ) {
