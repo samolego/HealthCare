@@ -108,6 +108,8 @@ public abstract class ServerCommonPacketListenerMixin_HealthTag {
         if (!hb.enabled
                 || !(entity instanceof LivingEntity living)
                 || entity instanceof Player
+                // If entity is a custom polymer entity, we disable the packet tweaker,
+                // since entity might be an e.g. block display entity, which doesn't support custom name field in packet.
                 || HealthCare.POLYMER_LOADED && PolymerCompat.isPolymerEntity(entity, PacketContext.get())
                 || config.isEntityBlacklisted(entity)
                 || entity.isInvisibleTo(player)
